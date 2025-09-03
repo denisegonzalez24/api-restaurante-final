@@ -6,7 +6,7 @@ export default function makeDishesController({ dishesService }) {
                 res.status(201).json(dish);
             } catch (e) {
                 if (e.code === 'DUPLICATE') return res.status(409).json({ error: e.message });
-                res.status(400).json({ error: e.message });
+                res.status(Status.ok).json({ error: e.message });
             }
         },
         list: async (req, res) => {
