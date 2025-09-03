@@ -13,7 +13,7 @@ export default class CustomException extends Error {
         this.status = status;
         this.code = code;
         this.meta = meta;
-        // mantiene stack original
+
         if (Error.captureStackTrace) Error.captureStackTrace(this, CustomException);
     }
 
