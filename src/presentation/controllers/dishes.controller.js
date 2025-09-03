@@ -1,3 +1,5 @@
+import Status from "../../shared/status";
+
 export default function makeDishesController({ dishesService }) {
     return {
         create: async (req, res) => {
