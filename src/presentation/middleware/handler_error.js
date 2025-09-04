@@ -1,5 +1,6 @@
-import { CustomException } from "../../shared/custom_exception";
-import { Status } from "../../shared/status";
+import { CustomException } from "../../shared/custom_exception.js";
+import Status from "../../shared/status.js";
+
 
 export default function handleError(req, res, err) {
     let ex;
@@ -11,7 +12,7 @@ export default function handleError(req, res, err) {
             title: 'Internal Server Error',
             message: err.message,
             stack: err.stack,
-            status: Status
+            status: Status.internalServerError
         });
     }
 

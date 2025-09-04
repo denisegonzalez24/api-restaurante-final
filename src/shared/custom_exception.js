@@ -1,35 +1,17 @@
-export default class CustomException extends Error {
-    /**
-     * @param {Object} args
-     * @param {string} args.title
-     * @param {string} args.message
-     * @param {number} [args.status=Status.internalServerError] 
-     */
+import Status from "./status.js";
 
-    constructor({ title, message, status = status.internalServerError }) {
+
+
+export class CustomException extends Error {
+    constructor({ message, status = Status.internalServerError }) {
         super(message);
-        this.name = 'CustomException';
-        this.title = title;
+        this.name = "CustomException";
         this.status = status;
-        this.code = code;
-        this.meta = meta;
-
         if (Error.captureStackTrace) Error.captureStackTrace(this, CustomException);
     }
 
     toJSON() {
-        return {
-            title: this.title,
-            message: this.message,
-            code: this.code,
-            // Por seguridad, no exponer stack en prod. Lo dejamos opcional:
-            ...(process.env.NODE_ENV !== 'production' ? { stack: this.stack } : {}),
-            ...(this.meta ? { meta: this.meta } : {})
-        };
-    }
-
-    toJsonString() {
-        return JSON.stringify(this.toJSON());
+        return { message: this.message ?? "Error" };
     }
 }
 
