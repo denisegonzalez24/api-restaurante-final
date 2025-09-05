@@ -1,5 +1,6 @@
 import { assertDishRepo } from "../../domain/ports/dishRepo.port.js";
-import { Status } from "../../shared/status.js";
+import Status from "../../shared/status.js";
+
 
 export function makeUpdateDish({ dishRepo }) {
     const repo = assertDishRepo(dishRepo);

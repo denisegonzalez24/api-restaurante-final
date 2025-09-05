@@ -1,4 +1,5 @@
-import { Status } from "../../shared/status.js";
+
+import Status from "../../shared/status.js";
 import { toCreateDishDto, toUpdateDishDto, toListParams } from "../mappers/dish.mapper.js";
 
 // Controller recibe casos de uso (CQRS) por DI
