@@ -11,7 +11,7 @@ const {
     DB_LOGGING = "false"
 } = process.env;
 
-// conexión admin a 'postgres' para crear DB si falta
+
 const admin = new Sequelize("postgres", DB_USER, DB_PASS, {
     host: DB_HOST,
     port: Number(DB_PORT),
@@ -20,7 +20,7 @@ const admin = new Sequelize("postgres", DB_USER, DB_PASS, {
     dialectOptions: DB_SSL === "true" ? { ssl: { require: true, rejectUnauthorized: false } } : {}
 });
 
-// conexión normal a tu DB
+
 export const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASS, {
     host: DB_HOST,
     port: Number(DB_PORT),
@@ -41,7 +41,6 @@ async function ensureDatabase() {
     }
 }
 
-// MODELOS
 export const Category = sequelize.define("Category", {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     name: { type: DataTypes.STRING(255), allowNull: false, unique: true },
@@ -66,7 +65,7 @@ Category.hasMany(Dish, { foreignKey: "categoryId" });
 export async function initDb() {
     await ensureDatabase();
     await sequelize.authenticate();
-    await sequelize.sync(); // code-first
+    await sequelize.sync();
 }
 
 export const models = { Category, Dish };

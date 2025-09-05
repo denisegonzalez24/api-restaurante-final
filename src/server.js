@@ -18,7 +18,7 @@ async function main() {
     const app = express();
     app.use(express.json());
 
-    // Infra concreta
+
     const dishRepo = makeDishRepositorySequelize({ models });
 
     // Application (CQRS)
@@ -32,9 +32,6 @@ async function main() {
 
     // Respeta tu OpenAPI: /api/v1/Dish
     app.use("/api/v1/Dish", dishRoutes);
-
-    // app.use(notFoundHandler);
-    // app.use(errorHandler);
 
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => console.log(`🚀 API running on http://localhost:${PORT}`));
