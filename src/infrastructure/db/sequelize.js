@@ -31,9 +31,9 @@ export const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASS, {
 
 async function ensureDatabase() {
     try {
-        await sequelize.authenticate(); // si conecta, ya existe
+        await sequelize.authenticate();
     } catch (e) {
-        if (e?.original?.code === "3D000") { // DB no existe
+        if (e?.original?.code === "3D000") {
             await admin.query(`CREATE DATABASE "${DB_NAME}"`);
         } else {
             throw e;

@@ -14,6 +14,6 @@ export function makeListDishes({ dishRepo }) {
             }
             params.priceOrder = up;
         }
-        return repo.findAll(params || {});   // lectura
+        return repo.findAll(params || {});
     };
 }

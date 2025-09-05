@@ -10,6 +10,7 @@ import { makeListDishes } from "./application/queries/listDishes.query.js";
 
 import { makeDishController } from "./presentation/controllers/dish.controller.js";
 import { makeDishRoutes } from "./presentation/routes/dish.routes.js";
+import { logPurple } from "./shared/log_custom.js";
 
 
 async function main() {
@@ -39,6 +40,6 @@ async function main() {
     app.use("/api/v1/Dish", dishRoutes);
 
     const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => console.log(` API running on http://localhost:${PORT}`));
+    app.listen(PORT, () => logPurple(`Api escuchando en el puerto: http://localhost:${PORT}`));
 }
 main();
