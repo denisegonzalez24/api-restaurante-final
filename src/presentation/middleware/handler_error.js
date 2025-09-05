@@ -2,19 +2,23 @@ import { CustomException } from "../../shared/custom_exception.js";
 import Status from "../../shared/status.js";
 
 
-export default function handleError(req, res, err) {
-    let ex;
-
+export function errorHandler(err, req, res, next) {
     if (err instanceof CustomException) {
-        ex = err;
-    } else {
-        ex = new CustomException({
-            title: 'Internal Server Error',
-            message: err.message,
-            stack: err.stack,
-            status: Status.internalServerError
-        });
+        return res.status(err.status).json({ message: err.message });
     }
 
-    return res.status(ex.status).json(ex.toJSON());
+    if (err?.name === "SequelizeUniqueConstraintError") {
+        return res.status(Status.conflict).json({ message: "Ya existe un registro con ese valor único" });
+    }
+
+    if (err?.name === "SequelizeValidationError") {
+        return res.status(Status.badRequest).json({ message: err.message });
+    }
+
+    console.error("[UnhandledError]", err);
+    return res.status(Status.internalServerError).json({ message: "Error interno" });
+}
+
+export function notFoundHandler(req, res, next) {
+    res.status(Status.notFound).json({ message: `Route ${req.originalUrl} not found` });
 }

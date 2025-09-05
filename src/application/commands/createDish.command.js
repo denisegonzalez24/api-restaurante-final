@@ -19,7 +19,7 @@ export function makeCreateDish({ dishRepo }) {
         const exists = await repo.findByName(dto.name);
         if (exists) throw new CustomException({ message: "Ya existe un plato con ese nombre", status: Status.conflict });
 
-        const entity = makeDish(dto);     // aplica invariantes de Dominio
-        return repo.create(entity);       // escritura
+        const entity = makeDish(dto);
+        return repo.create(entity);
     };
 }
