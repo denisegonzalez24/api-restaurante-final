@@ -1,7 +1,7 @@
-import { Op } from 'sequelize';
-import makeDish from '../../domain/entities/dish.js';
+import { Op } from "sequelize";
+import { makeDish } from "../../domain/entities/dish.js";
 
-export default function makeDishRepositorySequelize({ models }) {
+export function makeDishRepositorySequelize({ models }) {
     const { Dish, Category } = models;
 
     return {
@@ -11,8 +11,8 @@ export default function makeDishRepositorySequelize({ models }) {
                 description: entity.description,
                 price: entity.price,
                 available: entity.available ?? true,
-                categoryId: entity.categoryId,
-                imageUrl: entity.imageUrl
+                imageUrl: entity.imageUrl,
+                categoryId: entity.categoryId
             });
             return makeDish({ ...row.get() });
         },
@@ -28,14 +28,17 @@ export default function makeDishRepositorySequelize({ models }) {
             return row ? makeDish({ ...row.get() }) : null;
         },
 
-        async findAll({ name, categoryId, priceOrder }) {
+        async findAll({ name, categoryId, priceOrder, onlyActive = true }) {
             const where = {};
             if (name) where.name = { [Op.like]: `%${name}%` };
             if (categoryId) where.categoryId = categoryId;
-            const order = priceOrder ? [['price', priceOrder]] : [];
+            if (onlyActive) where.available = true;
+
+            const order = priceOrder ? [["price", priceOrder]] : [];
+
             const rows = await Dish.findAll({
                 where, order,
-                include: [{ model: Category, attributes: ['id', 'name'] }]
+                include: [{ model: Category, attributes: ["id", "name"] }]
             });
             return rows.map(r => makeDish({ ...r.get() }));
         }

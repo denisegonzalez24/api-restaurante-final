@@ -1,30 +1,42 @@
+import express from "express";
+import "dotenv/config";
 
-import express, { json } from 'express';
-import models from './infrastructure/db/sequelize.js';
-import makeDishesService from './application/services/dishes.service.js';
-import makeDishesController from './presentation/controllers/dishes.controller.js';
-import makeDishesRoutes from './presentation/routes/dishes.routes.js';
-import db from './infrastructure/db/sequelize.js';
-import makeDishRepositorySequelize from './infrastructure/repositories/dish.repository.sequelize.js'
-import dotenv from 'dotenv';
+import { initDb, models } from "./infrastructure/db/sequelize.js";
+import { makeDishRepositorySequelize } from "./infrastructure/repositories/dish.repository.sequelize.js";
 
-dotenv.config({ path: process.env.ENV_FILE || ".env" });
+import { makeCreateDish } from "./application/commands/createDish.command.js";
+import { makeUpdateDish } from "./application/commands/updateDish.command.js";
+import { makeListDishes } from "./application/queries/listDishes.query.js";
+
+import { makeDishController } from "./presentation/controllers/dish.controller.js";
+import { makeDishRoutes } from "./presentation/routes/dish.routes.js";
+
 
 async function main() {
-    await db.initDb();
+    await initDb();
 
     const app = express();
-    app.use(json());
+    app.use(express.json());
 
-    // DI/wiring
+    // Infra concreta
     const dishRepo = makeDishRepositorySequelize({ models });
-    const dishesService = makeDishesService({ dishRepo });
-    const dishesController = makeDishesController({ dishesService });
-    const dishesRoutes = makeDishesRoutes(dishesController);
 
-    app.use('/api/dishes', dishesRoutes);
+    // Application (CQRS)
+    const createDish = makeCreateDish({ dishRepo });
+    const updateDish = makeUpdateDish({ dishRepo });
+    const listDishes = makeListDishes({ dishRepo });
+
+    // Presentation
+    const dishController = makeDishController({ createDish, updateDish, listDishes });
+    const dishRoutes = makeDishRoutes(dishController);
+
+    // Respeta tu OpenAPI: /api/v1/Dish
+    app.use("/api/v1/Dish", dishRoutes);
+
+    app.use(notFoundHandler);
+    app.use(errorHandler);
 
     const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => console.log(`API running on :${PORT}`));
+    app.listen(PORT, () => console.log(`🚀 API running on http://localhost:${PORT}`));
 }
 main();
