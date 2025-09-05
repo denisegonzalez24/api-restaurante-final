@@ -30,7 +30,9 @@ export function makeDishRepositorySequelize({ models }) {
 
         async findAll({ name, categoryId, priceOrder, onlyActive = true }) {
             const where = {};
-            if (name) where.name = { [Op.like]: `%${name}%` };
+            if (name && typeof name === "string") {
+                where.name = { [ILIKE]: `%${name}%` };
+            }
             if (categoryId) where.categoryId = categoryId;
             if (onlyActive) where.available = true;
 

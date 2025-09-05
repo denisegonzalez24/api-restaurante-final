@@ -23,9 +23,11 @@ export function toUpdateDishDto(body) {
 
 export function toListParams(query) {
     return {
-        name: query.name,
-        categoryId: query.category,
-        priceOrder: query.sortByPrice ? String(query.sortByPrice).toUpperCase() : undefined, // asc|desc -> ASC|DESC
+        name: query.name || undefined,
+        categoryId: query.category ? Number(query.category) : undefined,
+
+        priceOrder: query.sortByPrice ? String(query.sortByPrice).toUpperCase() : undefined,
+
         onlyActive: query.onlyActive !== undefined ? String(query.onlyActive) === "true" : true
     };
 }

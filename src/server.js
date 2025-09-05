@@ -30,10 +30,15 @@ async function main() {
     const dishController = makeDishController({ createDish, updateDish, listDishes });
     const dishRoutes = makeDishRoutes(dishController);
 
+    // const __filename = fileURLToPath(import.meta.url);
+    // const __dirname = path.dirname(__filename);
+    // const openapiPath = path.join(__dirname, "openapi", "restaurant.yaml");
+    // const openapiDoc = YAML.parse(fs.readFileSync(openapiPath, "utf8"));
+
     // Respeta tu OpenAPI: /api/v1/Dish
     app.use("/api/v1/Dish", dishRoutes);
 
     const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => console.log(`🚀 API running on http://localhost:${PORT}`));
+    app.listen(PORT, () => console.log(` API running on http://localhost:${PORT}`));
 }
 main();
