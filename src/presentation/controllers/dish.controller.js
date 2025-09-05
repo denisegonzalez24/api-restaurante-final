@@ -10,21 +10,21 @@ export function makeDishController({ createDish, updateDish, listDishes }) {
                 const dto = toCreateDishDto(req.body);
                 const result = await createDish(dto);
                 res.status(Status.created).json(result);
-            } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+            } catch (e) { res.status(e.status || 500).json({ message: e.message }); }
         },
         list: async (req, res, next) => {
             try {
                 const params = toListParams(req.query);
                 const result = await listDishes(params);
                 res.status(Status.ok).json(result);
-            } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+            } catch (e) { res.status(e.status || 500).json({ message: e.message }); }
         },
         update: async (req, res, next) => {
             try {
                 const dto = toUpdateDishDto(req.body);
                 const result = await updateDish(req.params.id, dto);
                 res.status(Status.ok).json(result);
-            } catch (e) { res.status(e.status || 500).json({ error: e.message }); }
+            } catch (e) { res.status(e.status || 500).json({ message: e.message }); }
         }
     };
 }
