@@ -1,4 +1,4 @@
-const { initDb, models } = require('../db/sequelize.js');
+import { initDb, models } from '../db/sequelize.js';
 
 (async function run() {
     await initDb();

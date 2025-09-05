@@ -1,11 +1,11 @@
 import { Router } from 'express';
 
 export default function makeDishesRoutes(controller) {
-    const r = Router();
+    const route = Router();
 
-    r.post('/', controller.create);
-    r.get('/', controller.list);
-    r.put('/:id', controller.update);
+    route.post('/', controller.create);
+    route.get('/', controller.list);
+    route.put('/:id', controller.update);
 
-    return r;
+    return route;
 }
