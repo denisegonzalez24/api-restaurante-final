@@ -31,12 +31,13 @@ export function makeDishRepositorySequelize({ models }) {
         async findAll({ name, categoryId, priceOrder, onlyActive = true }) {
             const where = {};
             if (name && typeof name === "string") {
-                where.name = { [ILIKE]: `%${name}%` };
+                where.name = { [Op.iLike]: `%${name}%` };
             }
             if (categoryId) where.categoryId = categoryId;
             if (onlyActive) where.available = true;
 
-            const order = priceOrder ? [["price", priceOrder]] : [];
+            const order = params.priceOrder ? [["price", params.priceOrder]] : undefined;
+            logPurple("imprimo variables", { where, order });
 
             const rows = await Dish.findAll({
                 where, order,
