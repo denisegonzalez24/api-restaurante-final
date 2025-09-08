@@ -9,7 +9,6 @@ export default (sequelize) =>
         available: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
         imageUrl: { type: DataTypes.TEXT, allowNull: true },
 
-        // 👇 clave del problema:
         createDate: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
         updateDate: { type: DataTypes.DATE, allowNull: true },
 

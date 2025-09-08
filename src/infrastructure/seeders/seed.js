@@ -1,8 +1,8 @@
-// src/infrastructure/seeders/seed-all.js
+
 import { Models, sequelize, syncDb } from "../db/sequelize.js";
 
 async function seedAll({ reset = false } = {}) {
-    // 1) recrear o sincronizar el schema
+
     if (reset) {
         console.log(">> RESET: recreando todas las tablas (force:true)");
         await syncDb({ force: true });
@@ -13,17 +13,16 @@ async function seedAll({ reset = false } = {}) {
 
     const { DeliveryType, Status, Category } = Models;
 
-    // 2) DeliveryType
+
     await DeliveryType.bulkCreate(
         [
             { id: 1, name: "Delivery" },
             { id: 2, name: "Take away" },
             { id: 3, name: "Dine in" },
         ],
-        { ignoreDuplicates: true } // Postgres: ON CONFLICT DO NOTHING (por PK)
+        { ignoreDuplicates: true }
     );
 
-    // 3) Status
     await Status.bulkCreate(
         [
             { id: 1, name: "Pending" },
@@ -35,7 +34,6 @@ async function seedAll({ reset = false } = {}) {
         { ignoreDuplicates: true }
     );
 
-    // 4) Category (1..10) con descripciones y orden exacto
     await Category.bulkCreate(
         [
             { id: 1, name: "Entradas", description: "Pequeñas porciones para abrir el apetito antes del plato principal.", order: 1 },
@@ -56,7 +54,6 @@ async function seedAll({ reset = false } = {}) {
     await sequelize.close();
 }
 
-// Permite correr con `RESET=true node ...` para recrear todo
 const reset = String(process.env.RESET || "false").toLowerCase() === "true";
 seedAll({ reset }).catch((e) => {
     console.error("❌ Error en seed:", e);

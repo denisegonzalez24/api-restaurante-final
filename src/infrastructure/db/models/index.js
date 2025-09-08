@@ -39,10 +39,9 @@ export function initModels(sequelize) {
 
     const models = { Category, DeliveryType, Status, Dish, Order, OrderItem };
 
-    // ⬇️ Logs SEGUROS (sin stringify)
-    console.log("[ORM] Models:", Object.keys(models));                // ['Category','DeliveryType','Status','Dish','Order','OrderItem']
-    console.log("[ORM] Category table:", Category.tableName);        // 'Categories'
-    console.log("[ORM] Category attrs:", Object.keys(Category.rawAttributes)); // ['id','name','description','order']
+    //  console.log("[ORM] Models:", Object.keys(models));
+    //  console.log("[ORM] Category table:", Category.tableName);
+    //  console.log("[ORM] Category attrs:", Object.keys(Category.rawAttributes));
 
     return models;
 }
