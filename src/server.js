@@ -62,12 +62,6 @@ async function main() {
     const dishController = makeDishController({ createDish, updateDish, listDishes });
     app.use("/api/v1/Dish", makeDishRoutes(dishController));
 
-    app.get("/health", (_req, res) => res.json({ ok: true }));
-    app.use((err, _req, res, _next) => {
-        const status = err?.status ?? err?.httpCode ?? 500;
-        const message = err?.message || "Internal Server Error";
-        res.status(status).json({ message });
-    });
     app.use(errorHandler);
 
     const PORT = Number(process.env.PORT || 3000);

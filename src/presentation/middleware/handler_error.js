@@ -1,18 +1,21 @@
 import { ApiError } from "../../shared/ApiError.js";
+import { logCyan } from "../../shared/log_custom.js";
 import Status from "../../shared/status.js";
 
 export function errorHandler(err, req, res, next) {
-
+    let ex;
     if (err?.name === 'SequelizeUniqueConstraintError') {
         return res.status(Status.conflict).json({ message: 'Ya existe un plato con ese nombre' });
     }
 
     if (err instanceof ApiError) {
-        return res.status(err.statusCode).json({ message: err.message ?? null });
+        ex = err;
+    } else {
+        ex = new ApiError({ message: err?.message, status: err?.status || Status.internalServerError, stack: err?.stack });
     }
 
-    console.error(err);
-    return res.status(Status.internalServerError).json({ message: 'Error interno' });
+    logCyan(JSON.stringify(ex));
+    return res.status(Status.internalServerError).json(ex.toJSON());
 }
 
 
