@@ -1,6 +1,6 @@
 
 import Status from "../../shared/status.js";
-import { toCreateDishDto, toUpdateDishDto, toListParams } from "../mappers/dish.mapper.js";
+import { toCreateDishDto, toUpdateDishDto, toListParams, toDishesResponse, toDishResponse } from "../mappers/dish.mapper.js";
 
 
 export function makeDishController({ createDish, updateDish, listDishes }) {
@@ -9,22 +9,23 @@ export function makeDishController({ createDish, updateDish, listDishes }) {
             try {
                 const dto = toCreateDishDto(req.body);
                 const result = await createDish(dto);
-                res.status(Status.created).json(result);
+                res.status(Status.created).json(toDishResponse(result));
             } catch (e) { res.status(e.status || 500).json({ message: e.message }); }
         },
         list: async (req, res, next) => {
             try {
                 const params = toListParams(req.query);
                 const result = await listDishes(params);
-                res.status(Status.ok).json(result);
+                res.status(Status.ok).json(toDishesResponse(result));
             } catch (e) { res.status(e.status || 500).json({ message: e.message }); }
         },
         update: async (req, res, next) => {
             try {
                 const dto = toUpdateDishDto(req.body);
                 const result = await updateDish(req.params.id, dto);
-                res.status(Status.ok).json(result);
+                res.status(Status.ok).json(toDishResponse(result));
             } catch (e) { res.status(e.status || 500).json({ message: e.message }); }
         }
     };
 }
+
