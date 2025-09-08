@@ -1,5 +1,4 @@
 import { Op } from "sequelize";
-import { models } from "../db/sequelize.js";
 
 
 export function dishQueryRepository({ models }) {

@@ -1,9 +1,9 @@
 import Status from "./status.js";
 
-export class CustomException extends Error {
+export class ApiError extends Error {
     constructor({ message, status = Status.internalServerError }) {
         super(message);
-        this.name = "CustomException";
+        this.name = "ApiError";
         this.status = status;
     }
 

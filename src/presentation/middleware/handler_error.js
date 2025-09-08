@@ -1,24 +1,23 @@
-import { CustomException } from "../../shared/custom_exception.js";
+import { ApiError } from "../../shared/ApiError.js";
 import Status from "../../shared/status.js";
 
-
 export function errorHandler(err, req, res, next) {
-    if (err instanceof CustomException) {
-        return res.status(err.status).json({ message: err.message });
+    // Sequelize unique -> 409
+    if (err?.name === 'SequelizeUniqueConstraintError') {
+        return res.status(409).json({ message: 'Ya existe un plato con ese nombre' });
     }
-
-    if (err?.name === "SequelizeUniqueConstraintError") {
-        return res.status(Status.conflict).json({ message: "Ya existe un registro con ese valor único" });
+    // Errores de dominio
+    if (err instanceof ApiError) {
+        return res.status(err.statusCode).json({ message: err.message ?? null });
     }
-
-    if (err?.name === "SequelizeValidationError") {
-        return res.status(Status.badRequest).json({ message: err.message });
-    }
-
-    console.error("[UnhandledError]", err);
-    return res.status(Status.internalServerError).json({ message: "Error interno" });
+    // Fallback
+    console.error(err);
+    return res.status(500).json({ message: 'Error interno' });
 }
+
 
 export function notFoundHandler(req, res, next) {
     res.status(Status.notFound).json({ message: `Route ${req.originalUrl} not found` });
 }
+
+

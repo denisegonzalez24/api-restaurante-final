@@ -23,6 +23,8 @@ import yaml from "js-yaml";
 import { fileURLToPath } from "node:url";
 import { Model } from "sequelize";
 import { initModels } from "./infrastructure/db/models/index.js";
+import { errorHandler } from "./presentation/middleware/handler_error.js";
+import { categoryQueryRepository } from "./infrastructure/query/category.query.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -60,9 +62,10 @@ async function main() {
 
     const dishQueryRepo = dishQueryRepository({ models });
     const dishCommandRepo = dishCommandRepository({ models });
+    const categoryQueryRepo = categoryQueryRepository({ models });
 
-    const createDish = makeCreateDish({ dishCommandRepo, dishQueryRepo });
-    const updateDish = makeUpdateDish({ dishCommandRepo });
+    const createDish = makeCreateDish({ dishCommandRepo, dishQueryRepo, categoryQueryRepo });
+    const updateDish = makeUpdateDish({ dishCommandRepo, dishQueryRepo, categoryQueryRepo });
     const listDishes = makeListDishes({ dishQueryRepo });
 
     const dishController = makeDishController({ createDish, updateDish, listDishes });
@@ -75,6 +78,7 @@ async function main() {
         const message = err?.message || "Internal Server Error";
         res.status(status).json({ message });
     });
+    app.use(errorHandler);
 
     // 6) Listen
     const PORT = Number(process.env.PORT || 3000);

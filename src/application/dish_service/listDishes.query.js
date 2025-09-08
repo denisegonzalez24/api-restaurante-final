@@ -1,6 +1,6 @@
 
 import { assertDishRepoQuery } from "../../domain/ports/dishRepoQuery.port.js";
-import { CustomException } from "../../shared/custom_exception.js";
+import { ApiError } from "../../shared/ApiError.js";
 import Status from "../../shared/status.js";
 
 
@@ -12,7 +12,7 @@ export function makeListDishes({ dishQueryRepo }) {
         if (params?.priceOrder) {
             const up = String(params.priceOrder).toUpperCase();
             if (!["ASC", "DESC"].includes(up)) {
-                throw new CustomException({ message: "Parámetros de ordenamiento inválidos", status: Status.badRequest });
+                throw new ApiError({ message: "Parámetros de ordenamiento inválidos", status: Status.badRequest });
             }
             params.priceOrder = up;
         }
