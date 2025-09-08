@@ -1,71 +1,33 @@
+// src/infrastructure/db/sequelize.js
+import { Sequelize } from "sequelize";
 import "dotenv/config";
-import { Sequelize, DataTypes } from "sequelize";
-
-const {
-    DB_HOST = "localhost",
-    DB_PORT = 5432,
-    DB_NAME = "restaurant",
-    DB_USER = "postgres",
-    DB_PASS = "123456",
-    DB_SSL = "false",
-    DB_LOGGING = "false"
-} = process.env;
+import { initModels } from "./models/index.js";
 
 
-const admin = new Sequelize("postgres", DB_USER, DB_PASS, {
-    host: DB_HOST,
-    port: Number(DB_PORT),
-    dialect: "postgres",
-    logging: DB_LOGGING === "true" ? console.log : false,
-    dialectOptions: DB_SSL === "true" ? { ssl: { require: true, rejectUnauthorized: false } } : {}
-});
 
+const DIALECT = (process.env.DB_DIALECT || "postgres").toLowerCase();
 
-export const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASS, {
-    host: DB_HOST,
-    port: Number(DB_PORT),
-    dialect: "postgres",
-    logging: DB_LOGGING === "true" ? console.log : false,
-    dialectOptions: DB_SSL === "true" ? { ssl: { require: true, rejectUnauthorized: false } } : {}
-});
+export const sequelize =
+    DIALECT === "sqlite"
+        ? new Sequelize({
+            dialect: "sqlite",
+            storage: process.env.SQLITE_PATH || "src/infrastructure/db/seeders/data.sqlite",
+            logging: false,
+        })
+        : new Sequelize({
+            dialect: "postgres",
+            host: process.env.DB_HOST || "localhost",
+            port: Number(process.env.DB_PORT || 5432),
+            database: process.env.DB_NAME || "restaurant",
+            username: process.env.DB_USER || "postgres",
+            password: process.env.DB_PASS || "123456",
+            logging: (process.env.DB_LOGGING || "false") === "true" ? console.log : false,
+        });
 
-async function ensureDatabase() {
-    try {
-        await sequelize.authenticate();
-    } catch (e) {
-        if (e?.original?.code === "3D000") {
-            await admin.query(`CREATE DATABASE "${DB_NAME}"`);
-        } else {
-            throw e;
-        }
-    }
-}
+export const models = initModels(sequelize);
 
-export const Category = sequelize.define("Category", {
-    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    name: { type: DataTypes.STRING(255), allowNull: false, unique: true },
-    description: { type: DataTypes.TEXT },
-    order: { type: DataTypes.INTEGER }
-}, { tableName: "categories", timestamps: false });
-
-export const Dish = sequelize.define("Dish", {
-    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    name: { type: DataTypes.STRING(255), allowNull: false, unique: true },
-    description: { type: DataTypes.TEXT },
-    price: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
-    available: { type: DataTypes.BOOLEAN, defaultValue: true },
-    imageUrl: { type: DataTypes.STRING },
-    createDate: { type: DataTypes.DATE, defaultValue: Sequelize.fn("now") },
-    updateDate: { type: DataTypes.DATE, defaultValue: Sequelize.fn("now") }
-}, { tableName: "dishes", timestamps: false });
-
-Dish.belongsTo(Category, { foreignKey: "categoryId" });
-Category.hasMany(Dish, { foreignKey: "categoryId" });
-
-export async function initDb() {
-    await ensureDatabase();
+export async function syncDb({ force = false, alter = true } = {}) {
     await sequelize.authenticate();
-    await sequelize.sync();
+    await sequelize.sync({ force, alter });
 }
 
-export const models = { Category, Dish };

@@ -1,10 +1,12 @@
-import { assertDishRepo } from "../../domain/ports/dishRepo.port.js";
+
+import { assertDishRepoQuery } from "../../domain/ports/dishRepoQuery.port.js";
+import { CustomException } from "../../shared/custom_exception.js";
 import Status from "../../shared/status.js";
-import CustomException from "../../shared/status.js";
 
 
-export function makeListDishes({ dishRepo }) {
-    const repo = assertDishRepo(dishRepo);
+
+export function makeListDishes({ dishQueryRepo }) {
+    const repo = assertDishRepoQuery(dishQueryRepo);
 
     return async function listDishes(params) {
         if (params?.priceOrder) {

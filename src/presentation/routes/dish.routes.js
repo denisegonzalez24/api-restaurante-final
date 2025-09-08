@@ -2,9 +2,9 @@ import { Router } from "express";
 
 export function makeDishRoutes(controller) {
     const r = Router();
-    r.post("/", controller.create);            // POST /api/v1/Dish
-    r.get("/", controller.list);               // GET  /api/v1/Dish
-    r.put("/:id", controller.update);          // PUT  /api/v1/Dish/{id}
+    r.post("/", controller.create);
+    r.get("/", controller.list);
+    r.put("/:id", controller.update);
     return r;
 }
 

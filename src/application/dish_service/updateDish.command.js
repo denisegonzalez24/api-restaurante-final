@@ -1,9 +1,10 @@
-import { assertDishRepo } from "../../domain/ports/dishRepo.port.js";
+import { assertDishRepoCommand } from "../../domain/ports/dishRepoCommand.port.js";
+import { CustomException } from "../../shared/custom_exception.js";
 import Status from "../../shared/status.js";
 
 
-export function makeUpdateDish({ dishRepo }) {
-    const repo = assertDishRepo(dishRepo);
+export function makeUpdateDish({ dishCommandRepo }) {
+    const repo = assertDishRepoCommand(dishCommandRepo);
 
     return async function updateDish(id, patch) {
         if (patch?.price != null && (isNaN(Number(patch.price)) || Number(patch.price) <= 0)) {

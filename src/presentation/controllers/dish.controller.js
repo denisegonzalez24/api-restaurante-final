@@ -2,7 +2,7 @@
 import Status from "../../shared/status.js";
 import { toCreateDishDto, toUpdateDishDto, toListParams } from "../mappers/dish.mapper.js";
 
-// Controller recibe casos de uso (CQRS) por DI
+
 export function makeDishController({ createDish, updateDish, listDishes }) {
     return {
         create: async (req, res, next) => {

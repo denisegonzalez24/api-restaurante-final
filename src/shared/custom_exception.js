@@ -5,7 +5,6 @@ export class CustomException extends Error {
         super(message);
         this.name = "CustomException";
         this.status = status;
-
     }
 
     toJSON() {
