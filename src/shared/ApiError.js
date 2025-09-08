@@ -7,11 +7,9 @@ export class ApiError extends Error {
         this.title = "ApiError";
         this.status = status;
 
-        // Si viene un stack externo, lo usamos
         if (stack) {
             this.stack = stack;
         } else {
-            // Si no, dejamos que el Error nativo lo genere
             Error.captureStackTrace?.(this, ApiError);
         }
     }
@@ -20,7 +18,7 @@ export class ApiError extends Error {
         return {
             message: this.message ?? "Error",
             status: this.status,
-            stack: this.stack // 👈 aquí lo incluyes en la respuesta
+            stack: this.stack
         };
     }
 }

@@ -1,4 +1,5 @@
 // src/infrastructure/db/models/index.js
+import { logPurple } from "../../../shared/log_custom.js";
 import categoryModel from "./category.model.js";
 import deliveryTypeModel from "./deliveryType.model.js";
 import dishModel from "./dish.model.js";
@@ -14,13 +15,10 @@ export function initModels(sequelize) {
     const Order = orderModel(sequelize);
     const OrderItem = orderItemModel(sequelize);
 
-    console.log("entre");
-
-
+    logPurple("inicio models");
 
     Category.hasMany(Dish, { foreignKey: "categoryId", as: "dishes" });
     Dish.belongsTo(Category, { foreignKey: "categoryId", as: "category" });
-    console.log(JSON.stringify(Category));
 
     DeliveryType.hasMany(Order, { foreignKey: "deliveryTypeId", as: "orders" });
     Order.belongsTo(DeliveryType, { foreignKey: "deliveryTypeId", as: "deliveryType" });

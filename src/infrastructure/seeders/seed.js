@@ -1,4 +1,5 @@
 
+import { logCyan } from "../../shared/log_custom.js";
 import { Models, sequelize, syncDb } from "../db/sequelize.js";
 
 async function seedAll({ reset = false } = {}) {
@@ -50,12 +51,12 @@ async function seedAll({ reset = false } = {}) {
         { ignoreDuplicates: true }
     );
 
-    console.log("✅ Precarga completa (DeliveryType, Status, Category).");
+    logCyan("Precarga completa (DeliveryType, Status, Category).");
     await sequelize.close();
 }
 
 const reset = String(process.env.RESET || "false").toLowerCase() === "true";
 seedAll({ reset }).catch((e) => {
-    console.error("❌ Error en seed:", e);
+    logCyan("Error en seed:", e);
     process.exit(1);
 });

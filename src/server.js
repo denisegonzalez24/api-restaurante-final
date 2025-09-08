@@ -11,20 +11,17 @@ import { makeDishController } from "./presentation/controllers/dish.controller.j
 import { makeDishRoutes } from "./presentation/routes/dish.routes.js";
 import { logCyan, logPurple } from "./shared/log_custom.js";
 
-
 import swaggerUi from "swagger-ui-express";
 import fs from "node:fs";
 import path from "node:path";
 import yaml from "js-yaml";
 import { fileURLToPath } from "node:url";
-import { Model } from "sequelize";
-import { initModels } from "./infrastructure/db/models/index.js";
 import { errorHandler } from "./presentation/middleware/handler_error.js";
 import { categoryQueryRepository } from "./infrastructure/query/category.query.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-console.log("[DB]", sequelize.getDialect(), sequelize.config.host, sequelize.config.database);
+logPurple(`BD Connexion ${sequelize.getDialect()} ${sequelize.config.host} ${sequelize.config.database}`);
 
 async function main() {
 
