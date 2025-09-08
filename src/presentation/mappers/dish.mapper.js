@@ -37,7 +37,7 @@ export function toDishResponse(model) {
         name: model.name,
         description: model.description ?? null,
         price: Number(model.price),
-        category: toGenericResponse(model.category.id),
+        category: toGenericResponse(model.category),
         image: model.imageUrl ?? null,
         isActive: !!model.available,
         createdAt: model.createDate?.toISOString?.() ?? null,
