@@ -57,6 +57,8 @@ export async function createApp() {
     // --- Rutas de la app ---
     const { routers } = buildContainer();
     app.use("/api/v1/Dish", routers.dish);
+    app.use("/api/v1", routers.catalog);
+    app.use("/api/v1/Order", routers.order);
 
     // --- Error handler ---
     app.use(errorHandler);

@@ -1,34 +1,40 @@
-// arma todas las dependencias y devuelve routers listos para montar
 import { models } from "../infrastructure/db/sequelize.js";
 
-import { dishQueryRepository } from "../infrastructure/query/dish.query.js";
-import { dishCommandRepository } from "../infrastructure/command/dish.command.js";
+// Catalog
 import { categoryQueryRepository } from "../infrastructure/query/category.query.js";
+import { deliveryTypeQueryRepository } from "../infrastructure/query/deliveryType.query.js";
+import { statusQueryRepository } from "../infrastructure/query/status.query.js";
 
-import { makeCreateDish } from "../application/dish_service/createDish.command.js";
-import { makeUpdateDish } from "../application/dish_service/updateDish.command.js";
-import { makeListDishes } from "../application/dish_service/listDishes.query.js";
+// Orders
+import { orderQueryRepository } from "../infrastructure/query/order.query.js";
+import { orderCommandRepository } from "../infrastructure/command/order.command.js";
 
-import { makeDishController } from "../presentation/controllers/dish.controller.js";
-import { makeDishRoutes } from "../presentation/routes/dish.routes.js";
+// Controllers + Routes
+import { makeCatalogController } from "../presentation/controllers/catalog.controller.js";
+import { makeOrderController } from "../presentation/controllers/order.controller.js";
+import { makeCatalogRoutes } from "../presentation/routes/catalog.routes.js";
+import { makeOrderRoutes } from "../presentation/routes/order.routes.js";
 
 export function buildContainer() {
-
-    const dishQueryRepo = dishQueryRepository({ models });
-    const dishCommandRepo = dishCommandRepository({ models });
+    // Repos de catálogo
     const categoryQueryRepo = categoryQueryRepository({ models });
+    const deliveryTypeQueryRepo = deliveryTypeQueryRepository({ models });
+    const statusQueryRepo = statusQueryRepository({ models });
 
+    // Repos de orden
+    const orderQueryRepo = orderQueryRepository({ models });
+    // inyecto models también en orderQueryRepo para controller (usa OrderItem)
+    orderQueryRepo.models = models;
+    const orderCommandRepo = orderCommandRepository({ models });
 
-    const createDish = makeCreateDish({ dishCommandRepo, dishQueryRepo, categoryQueryRepo });
-    const updateDish = makeUpdateDish({ dishCommandRepo, dishQueryRepo, categoryQueryRepo });
-    const listDishes = makeListDishes({ dishQueryRepo });
+    // Controllers
+    const catalogController = makeCatalogController({ categoryQueryRepo, deliveryTypeQueryRepo, statusQueryRepo });
+    const orderController = makeOrderController({ orderQueryRepo, orderCommandRepo });
 
-
-    const dishController = makeDishController({ createDish, updateDish, listDishes });
-
-
+    // Routers
     const routers = {
-        dish: makeDishRoutes(dishController),
+        catalog: makeCatalogRoutes(catalogController),
+        order: makeOrderRoutes(orderController),
     };
 
     return { routers };
