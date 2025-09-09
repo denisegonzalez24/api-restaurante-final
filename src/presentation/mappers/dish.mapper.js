@@ -31,17 +31,18 @@ export function toListParams(query) {
         onlyActive: query.onlyActive !== undefined ? String(query.onlyActive) === "true" : true
     };
 }
-export function toDishResponse(model) {
+export function toDishResponse({ dish, category }) {
+    console.log(dish);
     return {
-        id: model.id,
-        name: model.name,
-        description: model.description ?? null,
-        price: Number(model.price),
-        category: toGenericResponse(model.category),
-        image: model.imageUrl ?? null,
-        isActive: !!model.available,
-        createdAt: model.createDate?.toISOString?.() ?? null,
-        updatedAt: model.updateDate?.toISOString?.() ?? null,
+        id: dish.id,
+        name: dish.name,
+        description: dish.description ?? null,
+        price: Number(dish.price),
+        category: toGenericResponse(category),
+        image: dish.imageUrl ?? null,
+        isActive: !!dish.available,
+        createdAt: dish.createDate?.toISOString?.() ?? null,
+        updatedAt: dish.updateDate?.toISOString?.() ?? null,
     };
 }
 export function toDishesResponse(list) { return list.map(toDishResponse); }

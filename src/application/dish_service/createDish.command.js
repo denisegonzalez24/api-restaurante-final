@@ -27,6 +27,7 @@ export function makeCreateDish({ dishCommandRepo, dishQueryRepo, categoryQueryRe
         if (!categoryExists) throw new ApiError({ message: "La categoría no existe", status: Status.conflict });
 
         const entity = makeDish(dto);
-        return dishCommandRepo2.create(entity);
+        const dishCreated = await dishCommandRepo2.create(entity);
+        return { dish: dishCreated, category: categoryExists };
     };
 }
