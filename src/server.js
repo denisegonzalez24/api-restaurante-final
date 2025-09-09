@@ -1,71 +1,17 @@
+// src/server.js
+import { createApp } from "./app.js";
 
-import express from "express";
-import "dotenv/config";
-import { models, sequelize, syncDb } from "./infrastructure/db/sequelize.js"
-import { dishQueryRepository } from "./infrastructure/query/dish.query.js";
-import { dishCommandRepository } from "./infrastructure/command/dish.command.js";
-import { makeCreateDish } from "./application/dish_service/createDish.command.js";
-import { makeUpdateDish } from "./application/dish_service/updateDish.command.js";
-import { makeListDishes } from "./application/dish_service/listDishes.query.js";
-import { makeDishController } from "./presentation/controllers/dish.controller.js";
-import { makeDishRoutes } from "./presentation/routes/dish.routes.js";
-import { logCyan, logPurple } from "./shared/log_custom.js";
+const PORT = Number(process.env.PORT || 3000);
 
-import swaggerUi from "swagger-ui-express";
-import fs from "node:fs";
-import path from "node:path";
-import yaml from "js-yaml";
-import { fileURLToPath } from "node:url";
-import { errorHandler } from "./presentation/middleware/handler_error.js";
-import { categoryQueryRepository } from "./infrastructure/query/category.query.js";
+createApp()
+    .then((app) => {
+        app.listen(PORT, () => {
+            console.log(`API lista   → http://localhost:${PORT}`);
+            console.log(`Swagger UI  → http://localhost:${PORT}/docs`);
+        });
+    })
+    .catch((err) => {
+        console.error("Error al iniciar:", err);
+        process.exit(1);
+    });
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-logPurple(`BD Connexion ${sequelize.getDialect()} ${sequelize.config.host} ${sequelize.config.database}`);
-
-async function main() {
-
-    await syncDb({ alter: true });
-
-    const app = express();
-    app.use(express.json());
-
-    try {
-        const openapiPath = process.env.OPENAPI_FILE
-            ? (path.isAbsolute(process.env.OPENAPI_FILE)
-                ? process.env.OPENAPI_FILE
-                : path.join(__dirname, process.env.OPENAPI_FILE))
-            : path.join(__dirname, "openapi", "restaurant.yaml");
-
-        const swaggerDoc = yaml.load(fs.readFileSync(openapiPath, "utf8"));
-        const PORT = Number(process.env.PORT || 3000);
-        if (!swaggerDoc.servers || swaggerDoc.servers.length === 0) {
-            swaggerDoc.servers = [{ url: `http://localhost:${PORT}` }];
-        }
-        app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDoc, { explorer: true }));
-        logCyan(`Swagger UI listo en http://localhost:${PORT}/docs (OpenAPI: ${openapiPath})`);
-    } catch (e) {
-        console.warn(" No se pudo cargar el OpenAPI para Swagger UI. Define OPENAPI_FILE o coloca src/openapi/restaurant.yaml");
-    }
-
-    const dishQueryRepo = dishQueryRepository({ models });
-    const dishCommandRepo = dishCommandRepository({ models });
-    const categoryQueryRepo = categoryQueryRepository({ models });
-
-    const createDish = makeCreateDish({ dishCommandRepo, dishQueryRepo, categoryQueryRepo });
-    const updateDish = makeUpdateDish({ dishCommandRepo, dishQueryRepo, categoryQueryRepo });
-    const listDishes = makeListDishes({ dishQueryRepo });
-
-    const dishController = makeDishController({ createDish, updateDish, listDishes });
-    app.use("/api/v1/Dish", makeDishRoutes(dishController));
-
-    app.use(errorHandler);
-
-    const PORT = Number(process.env.PORT || 3000);
-    app.listen(PORT, () => logPurple(`API escuchando en http://localhost:${PORT}`));
-}
-
-main().catch((e) => {
-    console.error("Fatal on startup:", e);
-    process.exit(1);
-});
