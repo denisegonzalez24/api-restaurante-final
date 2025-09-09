@@ -20,9 +20,8 @@ export function dishCommandRepository({ models }) {
         async update(id, patch) {
 
             const now = Sequelize.fn('NOW');
-            const patchWithUpdatedAt = { ...patch, updatedDate: now };
+            await Dish.update({ ...patch, updateDate: now }, { where: { id } });
 
-            await Dish.update(patchWithUpdatedAt, { where: { id } });
             const row = await Dish.findByPk(id);
             return row ? makeDish({ ...row.get() }) : null;
         },
