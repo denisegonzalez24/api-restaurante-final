@@ -5,10 +5,10 @@ import { Models, sequelize, syncDb } from "../db/sequelize.js";
 async function seedAll({ reset = false } = {}) {
 
     if (reset) {
-        console.log(">> RESET: recreando todas las tablas (force:true)");
+        console.log("recreando todas las tablas (force:true)");
         await syncDb({ force: true });
     } else {
-        console.log(">> SYNC: ajustando tablas (alter:true)");
+        console.log(" ajustando tablas (alter:true)");
         await syncDb({ alter: true });
     }
 

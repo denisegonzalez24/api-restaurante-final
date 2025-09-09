@@ -1,3 +1,4 @@
+import { Sequelize } from "sequelize";
 import { makeDish } from "../../domain/entities/dish.js";
 
 export function dishCommandRepository({ models }) {
@@ -17,8 +18,14 @@ export function dishCommandRepository({ models }) {
         },
 
         async update(id, patch) {
-            await Dish.update(patch, { where: { id } });
+
+            const now = Sequelize.fn('NOW');
+            const patchWithUpdatedAt = { ...patch, updatedDate: now };
+            console.log(patchWithUpdatedAt);
+
+            await Dish.update(patchWithUpdatedAt, { where: { id } });
             const row = await Dish.findByPk(id);
+            console.log({ ...row.get() });
             return row ? makeDish({ ...row.get() }) : null;
         },
 

@@ -23,7 +23,8 @@ export function makeDishController({ createDish, updateDish, listDishes }) {
             try {
                 const dto = toUpdateDishDto(req.body);
                 const result = await updateDish(req.params.id, dto);
-                res.status(Status.ok).json(toDishResponse(result));
+                console.log(result);
+                res.status(Status.ok).json(toDishResponse({ dish: result.dish, category: result.category }));
             } catch (e) { next(e); }
         }
     };

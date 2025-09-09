@@ -33,6 +33,7 @@ export function toListParams(query) {
 }
 export function toDishResponse({ dish, category }) {
     console.log(dish);
+
     return {
         id: dish.id,
         name: dish.name,
@@ -45,4 +46,4 @@ export function toDishResponse({ dish, category }) {
         updatedAt: dish.updateDate?.toISOString?.() ?? null,
     };
 }
-export function toDishesResponse(list) { return list.map(toDishResponse); }
+export function toDishesResponse(list) { return list.map(item => toDishResponse({ dish: item, category: item.category })); }

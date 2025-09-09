@@ -1,5 +1,5 @@
 export const DishRepoMethods = Object.freeze([
-    "findByName", "findAll"
+    "findByName", "findAll", "findById"
 ]);
 
 export function assertDishRepoQuery(repo) {

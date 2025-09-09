@@ -8,6 +8,10 @@ export function dishQueryRepository({ models }) {
             const row = await Dish.findOne({ where: { name } });
             return row ? row.get() : null;
         },
+        async findById(id) {
+            const row = await Dish.findByPk(id);
+            return row ? row.get() : null;
+        },
 
         async findAll({ name, categoryId, priceOrder, onlyActive = true } = {}) {
             const where = {};
