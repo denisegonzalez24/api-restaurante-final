@@ -24,7 +24,7 @@ export function makeCreateDish({ dishCommandRepo, dishQueryRepo, categoryQueryRe
         if (exists) throw new ApiError({ message: "Ya existe un plato con ese nombre", status: Status.conflict });
 
         const categoryExists = await categoryQueryRepo2.findById(dto.categoryId);
-        if (!categoryExists) throw new ApiError({ message: "La categoría no existe", status: Status.conflict });
+        if (!categoryExists) throw new ApiError({ message: "La categoría no existe", status: Status.badRequest });
 
         const entity = makeDish(dto);
         const dishCreated = await dishCommandRepo2.create(entity);

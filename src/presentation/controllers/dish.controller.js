@@ -9,7 +9,7 @@ export function makeDishController({ createDish, updateDish, listDishes }) {
             try {
                 const dto = toCreateDishDto(req.body);
                 const result = await createDish(dto);
-                res.status(Status.created).json(toDishResponse(result));
+                res.status(Status.created).json(toDishResponse({ dish: result.dish, category: result.category }));
             } catch (e) { next(e); }
         },
         list: async (req, res, next) => {
