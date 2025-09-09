@@ -21,11 +21,9 @@ export function dishCommandRepository({ models }) {
 
             const now = Sequelize.fn('NOW');
             const patchWithUpdatedAt = { ...patch, updatedDate: now };
-            console.log(patchWithUpdatedAt);
 
             await Dish.update(patchWithUpdatedAt, { where: { id } });
             const row = await Dish.findByPk(id);
-            console.log({ ...row.get() });
             return row ? makeDish({ ...row.get() }) : null;
         },
 

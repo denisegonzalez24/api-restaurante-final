@@ -31,7 +31,6 @@ export function makeUpdateDish({ dishCommandRepo, dishQueryRepo, categoryQueryRe
         }
 
         const updated = await repo.update(id, patch);
-        console.log("updated", updated);
 
         return { dish: updated, category: categoryExists };
     };
