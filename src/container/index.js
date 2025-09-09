@@ -14,6 +14,7 @@ import { makeCatalogController } from "../presentation/controllers/catalog.contr
 import { makeOrderController } from "../presentation/controllers/order.controller.js";
 import { makeCatalogRoutes } from "../presentation/routes/catalog.routes.js";
 import { makeOrderRoutes } from "../presentation/routes/order.routes.js";
+import { makeDishController } from "../presentation/controllers/dish.controller.js";
 
 export function buildContainer() {
     // Repos de catálogo
@@ -27,15 +28,25 @@ export function buildContainer() {
     orderQueryRepo.models = models;
     const orderCommandRepo = orderCommandRepository({ models });
 
+    //funciones
+    const createDish =
+
     // Controllers
+    const dishController = makeDishController({ createDish, updateDish, listDishes });
     const catalogController = makeCatalogController({ categoryQueryRepo, deliveryTypeQueryRepo, statusQueryRepo });
     const orderController = makeOrderController({ orderQueryRepo, orderCommandRepo });
 
     // Routers
-    const routers = {
-        catalog: makeCatalogRoutes(catalogController),
-        order: makeOrderRoutes(orderController),
-    };
+    const dishRouter = makeDishRoutes(dishController);
+    const catalogRouter = makeCatalogRoutes(catalogController);
+    const orderRouter = makeOrderRoutes(orderController);
 
-    return { routers };
+
+    return {
+        routers: {
+            dish: dishRouter,
+            catalog: catalogRouter,
+            order: orderRouter,
+        },
+    };
 }
