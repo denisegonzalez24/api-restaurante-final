@@ -6,7 +6,6 @@ import path from "node:path";
 import yaml from "js-yaml";
 import { fileURLToPath } from "node:url";
 
-import { syncDb } from "./infrastructure/db/sequelize.js";
 import { buildContainer } from "./container/index.js";
 import { errorHandler } from "./presentation/middleware/handler_error.js";
 
@@ -14,7 +13,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export async function createApp() {
-    await syncDb({ alter: true });
+    // await syncDb({ alter: true });
+
 
     const app = express();
     app.use(express.json());
