@@ -2,63 +2,71 @@ import { Sequelize } from "sequelize";
 
 export function orderCommandRepository({ models }) {
     const { Order, OrderItem, Dish, Status } = models;
-    const sequelize = Order.sequelize; // usa la misma conexión del modelo
+    const sequelize = Order.sequelize;
 
     async function recalcTotal(orderId, t) {
-        const items = await OrderItem.findAll({ where: { orderId }, transaction: t });
-        const total = items.reduce((acc, it) => acc + Number(it.total || 0), 0);
-        await Order.update({ total }, { where: { id: orderId }, transaction: t });
+        const items = await OrderItem.findAll({
+            where: { orderId },
+            include: [{ model: Dish, as: "dish", attributes: ["price"] }],
+            transaction: t,
+        });
+        const total = items.reduce(
+            (acc, it) => acc + Number(it.quantity || 0) * Number(it.dish?.price || 0),
+            0
+        );
+        await Order.update({ price: total }, { where: { id: orderId }, transaction: t });
         return total;
     }
 
     async function computeOrderStatus(orderId, t) {
-        // Reglas simples por nombres estándar: Pending/InProgress/Ready/Delivered
-        const items = await OrderItem.findAll({
-            where: { orderId },
-            include: [{ model: Status, as: "status" }],
-            transaction: t,
-        });
-        const names = items.map(i => i.status?.name);
+        const items = await OrderItem.findAll({ where: { orderId }, transaction: t });
+        if (items.length === 0) return;
 
-        let next = "Pending";
-        if (names.length && names.every(n => n === "Delivered")) next = "Delivered";
-        else if (names.length && names.every(n => n === "Ready")) next = "Ready";
-        else if (names.some(n => n === "InProgress")) next = "InProgress";
-        else next = "Pending";
+        const statuses = Array.from(new Set(items.map((i) => i.statusId).filter(Boolean)));
+        let newStatusId;
 
-        const st = await Status.findOne({ where: { name: next }, transaction: t });
-        await Order.update({ statusId: st.id }, { where: { id: orderId }, transaction: t });
-        return st.id;
+        if (statuses.length === 1) {
+            newStatusId = statuses[0];
+        } else {
+
+            const current = await Order.findByPk(orderId, { transaction: t });
+            newStatusId = current?.overallStatusId ?? null;
+        }
+        if (newStatusId) {
+            await Order.update({ overallStatusId: newStatusId }, { where: { id: orderId }, transaction: t });
+        }
     }
 
     return {
-        async create({ deliveryTypeId, deliveryTo, items = [] }) {
-            return sequelize.transaction(async (t) => {
-                const pending = await Status.findOne({ where: { name: "Pending" }, transaction: t });
-                const now = Sequelize.fn("NOW");
 
+        async create(body) {
+            return sequelize.transaction(async (t) => {
+                const stPending = await Status.findOne({ where: { name: "Pending" }, transaction: t });
                 const order = await Order.create(
-                    { deliveryTypeId, deliveryTo, statusId: pending.id, total: 0, updateDate: now },
+                    {
+                        deliveryTo: body?.deliveryTo ?? null,
+                        notes: body?.notes ?? null,
+                        price: 0,
+                        deliveryTypeId: body?.deliveryTypeId ?? null,
+                        overallStatusId: stPending?.id ?? null,
+                        createDate: Sequelize.fn("NOW"),
+                    },
                     { transaction: t }
                 );
 
+                const items = Array.isArray(body?.items) ? body.items : [];
                 for (const it of items) {
                     const dish = await Dish.findByPk(it.dishId, { transaction: t });
-                    if (!dish || !dish.get().available) throw new Error(`Dish ${it.dishId} no disponible`);
-
-                    const qty = Number(it.quantity || 1);
-                    const unitPrice = Number(dish.get().price);
-
+                    if (!dish) throw new Error("Dish no encontrado");
+                    const qty = Math.max(1, Number(it.quantity || 1));
                     await OrderItem.create(
                         {
                             orderId: order.id,
                             dishId: dish.id,
                             quantity: qty,
-                            notes: it.notes ?? null,
-                            unitPrice,
-                            total: unitPrice * qty,
-                            statusId: pending.id,
-                            updateDate: now,
+                            notes: it?.notes ?? null,
+                            statusId: stPending?.id ?? null,
+                            createDate: Sequelize.fn("NOW"),
                         },
                         { transaction: t }
                     );
@@ -66,62 +74,60 @@ export function orderCommandRepository({ models }) {
 
                 await recalcTotal(order.id, t);
                 await computeOrderStatus(order.id, t);
-
-                // devolvés el POJO de la orden recién creada
-                const row = await Order.findByPk(order.id, { transaction: t });
-                return row ? row.get() : null;
+                return order.get();
             });
         },
 
         async addItem(orderId, { dishId, quantity = 1, notes = null }) {
             return sequelize.transaction(async (t) => {
-                const pending = await Status.findOne({ where: { name: "Pending" }, transaction: t });
-                const dish = await Dish.findByPk(dishId, { transaction: t });
-                if (!dish || !dish.get().available) throw new Error(`Dish ${dishId} no disponible`);
+                const order = await Order.findByPk(orderId, { transaction: t });
+                if (!order) throw new Error("Orden no encontrada");
 
-                const now = Sequelize.fn("NOW");
-                const unitPrice = Number(dish.get().price);
+                const dish = await Dish.findByPk(dishId, { transaction: t });
+                if (!dish) throw new Error("Dish no encontrado");
+
+                const stPending = await Status.findOne({ where: { name: "Pending" }, transaction: t });
 
                 await OrderItem.create(
                     {
-                        orderId,
-                        dishId,
-                        quantity,
+                        orderId: order.id,
+                        dishId: dish.id,
+                        quantity: Math.max(1, Number(quantity || 1)),
                         notes,
-                        unitPrice,
-                        total: unitPrice * Number(quantity),
-                        statusId: pending.id,
-                        updateDate: now,
+                        statusId: stPending?.id ?? null,
+                        createDate: Sequelize.fn("NOW"),
                     },
                     { transaction: t }
                 );
 
-                await recalcTotal(orderId, t);
-                await computeOrderStatus(orderId, t);
+                await recalcTotal(order.id, t);
+                await computeOrderStatus(order.id, t);
             });
         },
 
         async removeItem(orderItemId) {
             return sequelize.transaction(async (t) => {
-                const it = await OrderItem.findByPk(orderItemId, { transaction: t });
-                if (!it) return;
-                await OrderItem.destroy({ where: { id: orderItemId }, transaction: t });
-                await recalcTotal(it.orderId, t);
-                await computeOrderStatus(it.orderId, t);
+                const item = await OrderItem.findByPk(orderItemId, { transaction: t });
+                if (!item) throw new Error("Item no encontrado");
+                const orderId = item.orderId;
+                await item.destroy({ transaction: t });
+                await recalcTotal(orderId, t);
+                await computeOrderStatus(orderId, t);
             });
         },
 
         async updateItemStatus(orderItemId, status) {
             return sequelize.transaction(async (t) => {
-                const st = Number.isFinite(+status)
-                    ? await Status.findByPk(+status, { transaction: t })
-                    : await Status.findOne({ where: { name: status }, transaction: t });
-                if (!st) throw new Error("Status inválido");
+                const targetStatus =
+                    Number.isFinite(+status)
+                        ? await Status.findByPk(+status, { transaction: t })
+                        : await Status.findOne({ where: { name: status }, transaction: t });
+                if (!targetStatus) throw new Error("Status inválido");
 
                 const it = await OrderItem.findByPk(orderItemId, { transaction: t });
                 if (!it) throw new Error("Item no encontrado");
 
-                await it.update({ statusId: st.id, updateDate: Sequelize.fn("NOW") }, { transaction: t });
+                await it.update({ statusId: targetStatus.id, updateDate: Sequelize.fn("NOW") }, { transaction: t });
                 await computeOrderStatus(it.orderId, t);
             });
         },

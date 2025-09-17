@@ -13,6 +13,7 @@ import { makeCatalogRoutes } from "../presentation/routes/catalog.routes.js";
 import { makeDishRoutes } from "../presentation/routes/dish.routes.js";
 import { makeOrderRoutes } from "../presentation/routes/order.routes.js";
 import { models, syncDb } from "../infrastructure/db/sequelize.js";
+import { makeCatalogController } from "../presentation/controllers/catalog.controller.js";
 
 export async function buildContainer() {
 
@@ -23,7 +24,7 @@ export async function buildContainer() {
     const dishCommandRepo = dishCommandRepository({ models });
 
     const categoryQueryRepo = categoryQueryRepository({ models });
-    //   const categoryCommandRepo = categoryCommandRepository({ models });
+    // const categoryCommandRepo = categoryCommandRepository({ models });
 
     const orderQueryRepo = orderQueryRepository({ models });
     const orderCommandRepo = orderCommandRepository({ models });
@@ -39,28 +40,34 @@ export async function buildContainer() {
     const updateDish = makeUpdateDish({ dishCommandRepo, dishQueryRepo, categoryQueryRepo });
     const listDishes = makeListDishes({ dishQueryRepo });
 
-    //funicones catalog
-
+    //funciones category export const makeUpdateCategory = ({ categoryRepoQuery, categoryRepoCommand }) => async (id, dto) => {
+    const createCategory = makeCreateCategory()
+    const updateCategory = makeUpdateCategory({})
+    const deleteCategory = makeDeleteCategory()
+    const listCategories = makeListCategories()
+    const getCategoryById = makeGetCategoryById()
 
     //funciones order
-
+    categoryQueryRepo, deliveryTypeQueryRepo, statusQueryRepo
 
     //
 
     //controller 
     const dishController = makeDishController({ createDish, updateDish, listDishes });
+    const catalogController = makeCatalogController({ categoryQueryRepo, deliveryTypeQueryRepo, statusQueryRepo });
 
     // Routers
     const dishRouter = makeDishRoutes(dishController);
-    //const catalogRouter = makeCatalogRoutes(catalogController);
-    //const orderRouter = makeOrderRoutes(orderController);
+    const catalogRouter = makeCatalogRoutes(catalogController);
+    const orderRouter = makeOrderRoutes(orderController);
+    // const categoryRouter = makeCategoryRoutes(categoryController);
 
 
     return {
         routers: {
             dish: dishRouter,
-            //    catalog: catalogRouter,
-            //     order: orderRouter,
+            catalog: catalogRouter,
+            order: orderRouter,
         },
     };
 }
