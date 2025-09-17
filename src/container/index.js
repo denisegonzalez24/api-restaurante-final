@@ -14,6 +14,16 @@ import { makeDishRoutes } from "../presentation/routes/dish.routes.js";
 import { makeOrderRoutes } from "../presentation/routes/order.routes.js";
 import { models, syncDb } from "../infrastructure/db/sequelize.js";
 import { makeCatalogController } from "../presentation/controllers/catalog.controller.js";
+import { makeDeleteCategory } from "../application/category_service/deleteCategory.command.js";
+import { makeCreateCategory } from "../application/category_service/createCategory.command.js";
+import { makeUpdateCategory } from "../application/category_service/updateCategory.command.js";
+import { makeListCategories } from "../application/category_service/listCategories.query.js";
+import { makeGetCategoryById } from "../application/category_service/getCategoryById.query.js";
+import { makeOrderController } from "../presentation/controllers/order.controller.js";
+import categoryCommandRepository from "../infrastructure/command/category.command.js";
+import makeListDeliveryTypes from "../application/catalog_service/listDeliveryTypes.query.js";
+import makeListStatuses from "../application/catalog_service/listStatuses.query.js";
+import { makeCategoryController } from "../presentation/controllers/category.controller.js";
 
 export async function buildContainer() {
 
@@ -24,37 +34,45 @@ export async function buildContainer() {
     const dishCommandRepo = dishCommandRepository({ models });
 
     const categoryQueryRepo = categoryQueryRepository({ models });
-    // const categoryCommandRepo = categoryCommandRepository({ models });
+    const categoryCommandRepo = categoryCommandRepository({ models });
 
     const orderQueryRepo = orderQueryRepository({ models });
     const orderCommandRepo = orderCommandRepository({ models });
 
     const deliveryTypeQueryRepo = deliveryTypeQueryRepository({ models });
-    //   const deliveryTypeCommandRepo = deliveryTypeCommandRepository({ models });
-
     const statusQueryRepo = statusQueryRepository({ models });
-    //   const statusCommandRepo = statusCommandRepository({ models });
+
 
     //funciones dish
     const createDish = makeCreateDish({ dishCommandRepo, dishQueryRepo, categoryQueryRepo });
     const updateDish = makeUpdateDish({ dishCommandRepo, dishQueryRepo, categoryQueryRepo });
     const listDishes = makeListDishes({ dishQueryRepo });
 
-    //funciones category export const makeUpdateCategory = ({ categoryRepoQuery, categoryRepoCommand }) => async (id, dto) => {
-    const createCategory = makeCreateCategory()
-    const updateCategory = makeUpdateCategory({})
-    const deleteCategory = makeDeleteCategory()
-    const listCategories = makeListCategories()
-    const getCategoryById = makeGetCategoryById()
+    //funciones category
+    const createCategory = makeCreateCategory({ categoryQueryRepo, categoryCommandRepo });
+    const updateCategory = makeUpdateCategory({ categoryQueryRepo, categoryCommandRepo, dishQueryRepo });
+    const deleteCategory = makeDeleteCategory({ categoryQueryRepo, categoryCommandRepo, dishQueryRepo });
+    const listCategories = makeListCategories({ categoryQueryRepo });
+    const getCategoryById = makeGetCategoryById({ categoryQueryRepo });
+
+
+    const listDeliveryTypes = makeListDeliveryTypes({ deliveryTypeQueryRepo });
+    const listStatuses = makeListStatuses({ statusQueryRepo });
 
     //funciones order
-    categoryQueryRepo, deliveryTypeQueryRepo, statusQueryRepo
+    const createOrder = makeCreateOrder({ orderCommandRepo, orderQueryRepo });
+    const listOrders = makeListOrders({ orderQueryRepo });
+    const getOrderById = makeGetOrderById({ orderQueryRepo });
+    const addItemToOrder = makeAddItemToOrder({ orderCommandRepo, orderQueryRepo });
+    const removeItemFromOrder = makeRemoveItemFromOrder({ orderCommandRepo });
+    const updateOrderItemStatus = makeUpdateOrderItemStatus({ orderCommandRepo, orderQueryRepo });
 
-    //
 
     //controller 
     const dishController = makeDishController({ createDish, updateDish, listDishes });
-    const catalogController = makeCatalogController({ categoryQueryRepo, deliveryTypeQueryRepo, statusQueryRepo });
+    const catalogController = makeCatalogController({ listCategories, listDeliveryTypes, listStatuses, });
+    const orderController = makeOrderController({ createOrder, listOrders, getOrderById, addItemToOrder, removeItemFromOrder, updateOrderItemStatus });
+    const categoryController = makeCategoryController({ listCategories, getCategoryById, createCategory, updateCategory, deleteCategory, });
 
     // Routers
     const dishRouter = makeDishRoutes(dishController);
