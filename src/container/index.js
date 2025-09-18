@@ -24,6 +24,13 @@ import categoryCommandRepository from "../infrastructure/command/category.comman
 import makeListDeliveryTypes from "../application/catalog_service/listDeliveryTypes.query.js";
 import makeListStatuses from "../application/catalog_service/listStatuses.query.js";
 import { makeCategoryController } from "../presentation/controllers/category.controller.js";
+import { makeCreateOrder } from "../application/order_service/createOrder.command.js";
+import { makeListOrders } from "../application/order_service/listOrders.query.js";
+import { makeGetOrderById } from "../application/order_service/getOrderById.query.js";
+import { makeAddItemToOrder } from "../application/order_service/addItemToOrder.command.js";
+import { makeRemoveItemFromOrder } from "../application/order_service/removeItemFromOrder.command.js";
+import { makeUpdateOrderItemStatus } from "../application/order_service/updateOrderItemStatus.command.js";
+import { makeCategoryRoutes } from "../presentation/routes/category.routes.js";
 
 export async function buildContainer() {
 
@@ -78,7 +85,7 @@ export async function buildContainer() {
     const dishRouter = makeDishRoutes(dishController);
     const catalogRouter = makeCatalogRoutes(catalogController);
     const orderRouter = makeOrderRoutes(orderController);
-    // const categoryRouter = makeCategoryRoutes(categoryController);
+    const categoryRouter = makeCategoryRoutes(categoryController);
 
 
     return {

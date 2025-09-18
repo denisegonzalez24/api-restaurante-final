@@ -1,4 +1,4 @@
-// Agrega un plato y devuelve la orden recalculada (201)
+
 export function makeAddItemToOrder({ orderCommandRepo, orderQueryRepo }) {
     return async function addItemToOrder(orderId, { dishId, quantity, notes }) {
         if (!dishId) throw withStatus(new Error("dishId es obligatorio"), 400);
