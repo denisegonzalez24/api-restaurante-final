@@ -10,7 +10,6 @@ import { orderQueryRepository } from "../infrastructure/query/order.query.js";
 import { statusQueryRepository } from "../infrastructure/query/status.query.js";
 import { makeDishController } from "../presentation/controllers/dish.controller.js";
 import { makeCatalogRoutes } from "../presentation/routes/catalog.routes.js";
-import { makeDishRoutes } from "../presentation/routes/dish.routes.js";
 import { makeOrderRoutes } from "../presentation/routes/order.routes.js";
 import { models, syncDb } from "../infrastructure/db/sequelize.js";
 import { makeCatalogController } from "../presentation/controllers/catalog.controller.js";
@@ -31,6 +30,7 @@ import { makeAddItemToOrder } from "../application/order_service/addItemToOrder.
 import { makeRemoveItemFromOrder } from "../application/order_service/removeItemFromOrder.command.js";
 import { makeUpdateOrderItemStatus } from "../application/order_service/updateOrderItemStatus.command.js";
 import { makeCategoryRoutes } from "../presentation/routes/category.routes.js";
+import { makeDishRoutes } from "../presentation/routes/dish.routes.js";
 
 export async function buildContainer() {
 

@@ -19,6 +19,7 @@ export function makeOrderController({
     addItemToOrder,
     removeItemFromOrder,
     updateOrderItemStatus,
+    updateItemQuantity
 }) {
     return {
         create: async (req, res, next) => {
@@ -66,6 +67,13 @@ export function makeOrderController({
                 res.status(Status.ok).json(full);
             } catch (e) { next(e); }
         },
+        updateItemQuantity: async (req, res, next) => {
+            try {
+                const { quantity } = req.body || {};
+                const full = await updateItemQuantity(req.params.itemId, quantity);
+                res.status(Status.ok).json(full);
+            } catch (e) { next(e); }
+        }
     };
 }
 
