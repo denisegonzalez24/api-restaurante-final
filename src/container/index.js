@@ -88,6 +88,14 @@ export async function buildContainer() {
     const categoryRouter = makeCategoryRoutes(categoryController);
 
 
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const openapiPath = path.resolve(__dirname, "openapi", "restaurant.yaml");
+    const raw = fs.readFileSync(openapiPath, "utf8");
+    const swaggerDoc = yaml.load(raw);
+    const pathKeys = swaggerDoc?.paths ? Object.keys(swaggerDoc.paths) : [];
+    console.log(`[Swagger] Cargado: ${openapiPath} (paths: ${pathKeys.length})`);
+
 
     return {
         routers: {

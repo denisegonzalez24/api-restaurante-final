@@ -2,6 +2,11 @@
 import express from "express";
 import { buildContainer } from "./container/index.js";
 import { errorHandler } from "./presentation/middleware/handler_error.js";
+import path from "path";
+import swaggerUi from 'swagger-ui-express';
+import { fileURLToPath } from "url";
+import fs from "fs";
+import yaml from "js-yaml";
 
 export async function createApp() {
     const app = express();
@@ -15,13 +20,7 @@ export async function createApp() {
 
     app.use("/api/v1/Order", routers.order);
 
-    swaggerDoc = yaml.load(raw);
-
-    // Aseguro servers para “Try it out”
-    if (!swaggerDoc.servers || swaggerDoc.servers.length === 0) {
-        swaggerDoc.servers = [{ url: `http://localhost:${PORT}` }];
-    }
-
+    app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 
     app.use(errorHandler);
     return app;

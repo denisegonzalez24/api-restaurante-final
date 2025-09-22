@@ -18,22 +18,23 @@ export function initModels(sequelize) {
     logPurple("inicio models");
 
     Category.hasMany(Dish, { foreignKey: "categoryId", as: "dishes" });
-    Dish.belongsTo(Category, { foreignKey: "categoryId", as: "category" });
+    Dish.belongsTo(Category, { foreignKey: "categoryId", as: "category", targetKey: "id", onDelete: "RESTRICT", onUpdate: "CASCADE" });
 
     DeliveryType.hasMany(Order, { foreignKey: "deliveryTypeId", as: "orders" });
-    Order.belongsTo(DeliveryType, { foreignKey: "deliveryTypeId", as: "deliveryType" });
+    Order.belongsTo(DeliveryType, { foreignKey: "deliveryTypeId", as: "deliveryType", targetKey: "id", onDelete: "SET NULL", onUpdate: "CASCADE" });
 
     Status.hasMany(Order, { foreignKey: "overallStatusId", as: "orders" });
-    Order.belongsTo(Status, { foreignKey: "overallStatusId", as: "overallStatus" });
+    Order.belongsTo(Status, { foreignKey: "overallStatusId", as: "overallStatus", targetKey: "id", onDelete: "SET NULL", onUpdate: "CASCADE" });
 
     Order.hasMany(OrderItem, { foreignKey: "orderId", as: "items" });
-    OrderItem.belongsTo(Order, { foreignKey: "orderId", as: "order" });
+    OrderItem.belongsTo(Order, { foreignKey: "orderId", as: "order", targetKey: "id", onDelete: "CASCADE", onUpdate: "CASCADE" });
 
     Dish.hasMany(OrderItem, { foreignKey: "dishId", as: "items" });
-    OrderItem.belongsTo(Dish, { foreignKey: "dishId", as: "dish" });
+    OrderItem.belongsTo(Dish, { foreignKey: "dishId", as: "dish", targetKey: "id", onDelete: "RESTRICT", onUpdate: "CASCADE" });
 
     Status.hasMany(OrderItem, { foreignKey: "statusId", as: "orderItems" });
-    OrderItem.belongsTo(Status, { foreignKey: "statusId", as: "status" });
+    OrderItem.belongsTo(Status, { foreignKey: "statusId", as: "status", targetKey: "id", onDelete: "SET NULL", onUpdate: "CASCADE" });
+
 
     const models = { Category, DeliveryType, Status, Dish, Order, OrderItem };
 

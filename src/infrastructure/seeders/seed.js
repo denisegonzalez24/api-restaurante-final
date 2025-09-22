@@ -1,6 +1,6 @@
 
 import { logCyan } from "../../shared/log_custom.js";
-import { Models, sequelize, syncDb } from "../db/sequelize.js";
+import { models, sequelize, syncDb } from "../db/sequelize.js";
 
 async function seedAll({ reset = false } = {}) {
 
@@ -12,7 +12,7 @@ async function seedAll({ reset = false } = {}) {
         await syncDb({ alter: true });
     }
 
-    const { DeliveryType, Status, Category } = Models;
+    const { DeliveryType, Status, Category } = models;
 
 
     await DeliveryType.bulkCreate(
