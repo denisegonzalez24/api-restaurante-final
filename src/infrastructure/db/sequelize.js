@@ -26,7 +26,7 @@ export const sequelize =
 
 export const models = initModels(sequelize);
 
-export async function syncDb({ force = false, alter = true } = {}) {
+export async function syncDb({ force = false, alter = false } = {}) {
     await sequelize.authenticate();
     await sequelize.sync({ force, alter });
 }
