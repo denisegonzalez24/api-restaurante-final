@@ -15,6 +15,13 @@ export async function createApp() {
 
     app.use("/api/v1/Order", routers.order);
 
+    swaggerDoc = yaml.load(raw);
+
+    // Aseguro servers para “Try it out”
+    if (!swaggerDoc.servers || swaggerDoc.servers.length === 0) {
+        swaggerDoc.servers = [{ url: `http://localhost:${PORT}` }];
+    }
+
 
     app.use(errorHandler);
     return app;
