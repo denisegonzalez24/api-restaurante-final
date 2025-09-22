@@ -15,7 +15,6 @@ export async function createApp() {
 
     app.use("/api/v1/Order", routers.order);
 
-    app.get("/health", (_req, res) => res.json({ ok: true }));
 
     app.use(errorHandler);
     return app;
