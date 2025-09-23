@@ -27,7 +27,7 @@ export function orderCommandRepository({ models }) {
         let newStatusId;
 
         if (statuses.length === 1) {
-            newStatusId = statuses[0]; // todos iguales -> la orden toma ese estado
+            newStatusId = statuses[0];
         } else {
             const current = await Order.findByPk(orderId, { transaction: t });
             newStatusId = current?.overallStatusId ?? null; // conserva el actual

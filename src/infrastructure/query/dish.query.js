@@ -19,7 +19,7 @@ export function dishQueryRepository({ models }) {
             if (categoryId) where.categoryId = categoryId;
             if (onlyActive) where.available = true;
 
-            const order = priceOrder ? [["price", priceOrder === "DESC" ? "DESC" : "ASC"]] : undefined;
+            const order = priceOrder ? [["price", priceOrder === ORDER.DESC ? ORDER.DESC : ORDER.ASC]] : undefined;
 
             const rows = await Dish.findAll({
                 where,

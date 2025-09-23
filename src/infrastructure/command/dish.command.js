@@ -12,7 +12,9 @@ export function dishCommandRepository({ models }) {
                 price: entity.price,
                 available: entity.available ?? true,
                 imageUrl: entity.imageUrl,
-                categoryId: entity.categoryId
+                categoryId: entity.categoryId,
+                createDate: Sequelize.fn("NOW"),
+                updateDate: Sequelize.fn("NOW"),
             });
             return makeDish({ ...row.get() });
         },

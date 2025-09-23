@@ -21,7 +21,7 @@ export function makeUpdateDish({ dishCommandRepo, dishQueryRepo, categoryQueryRe
         }
 
         const categoryExists = await categoryQueryRepo2.findById(patch.categoryId);
-        if (!categoryExists) throw new ApiError({ message: "La categoría no existe", status: Status.conflict });
+        if (!categoryExists) throw new ApiError({ message: "La categoría no existe", status: Status.badRequest });
 
         if (patch?.name && patch.name.trim() !== current.name) {
             const other = await dishQueryRepo2.findByName(patch.name.trim());

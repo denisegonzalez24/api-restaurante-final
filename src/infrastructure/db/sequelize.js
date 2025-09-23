@@ -3,8 +3,6 @@ import { Sequelize } from "sequelize";
 import "dotenv/config";
 import { initModels } from "./models/index.js";
 
-
-
 const DIALECT = (process.env.DB_DIALECT || "postgres").toLowerCase();
 
 export const sequelize =
