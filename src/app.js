@@ -1,6 +1,6 @@
 // src/app.js (fragmento)
 import express from "express";
-import { buildContainer } from "./container/index.js";
+import { buildContainer } from "./build.router.js";
 import { errorHandler } from "./presentation/middleware/handler_error.js";
 import swaggerUi from 'swagger-ui-express';
 import { fileURLToPath } from "url";
@@ -29,9 +29,7 @@ export async function createApp() {
     console.log("Paths count:", Object.keys(swaggerDoc?.paths ?? {}).length);
     console.log("Some paths:", Object.keys(swaggerDoc?.paths ?? {}).slice(0, 5));
 
-
     app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDoc, { explorer: true }));
-
 
     app.use(errorHandler);
     return app;
