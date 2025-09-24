@@ -24,13 +24,15 @@ export function toUpdateDishDto(body) {
 }
 
 export function toListParams(query) {
-    return {
-        name: query.name || undefined,
-        categoryId: query.category ? Number(query.category) : undefined,
-        priceOrder: query.sortByPrice ? String(query.sortByPrice).toUpperCase() : undefined,
-        onlyActive: query.onlyActive !== undefined ? String(query.onlyActive) === "true" : true
-    };
+    const name = (query.name ?? "").trim() || undefined;
+    const category = query.category !== undefined && query.category !== "" ? Number(query.category) : undefined;
+    const onlyActive = query.onlyActive === undefined ? true : String(query.onlyActive) === "true";
+    const raw = String(query.sortByPrice ?? "").trim().toLowerCase();
+    const priceOrder = raw === "asc" ? "ASC" : raw === "desc" ? "DESC" : undefined;
+
+    return { name, category, onlyActive, priceOrder };
 }
+
 export function toDishResponse({ dish, category }) {
     console.log(dish);
 

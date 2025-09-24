@@ -8,7 +8,7 @@ import Status from "../../shared/status.js";
 export function makeListDishes({ dishQueryRepo }) {
     const repo = assertDishRepoQuery(dishQueryRepo);
 
-    return async function listDishes(params) {
+    return async function listDishes(params = {}) {
         if (params?.priceOrder) {
             const up = String(params.priceOrder).toUpperCase();
             if (!["ASC", "DESC"].includes(up)) {

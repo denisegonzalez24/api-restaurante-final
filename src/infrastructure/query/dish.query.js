@@ -1,5 +1,5 @@
 import { Op } from "sequelize";
-import { ORDER } from "../../shared/constants.js";
+
 
 
 export function dishQueryRepository({ models }) {
@@ -14,20 +14,20 @@ export function dishQueryRepository({ models }) {
             return row ? row.get() : null;
         },
 
-        async findAll({ name, categoryId, priceOrder, onlyActive = true } = {}) {
+        async findAll({ name, category, onlyActive = true, priceOrder } = {}) {
             const where = {};
             if (name) where.name = { [Op.iLike]: `%${name}%` };
-            if (categoryId) where.categoryId = categoryId;
+            if (category !== undefined) where.categoryId = Number(category);
             if (onlyActive) where.available = true;
 
-            const sort = (sortByPrice === "desc" ? ORDER.DESC : sortByPrice === "asc" ? ORDER.ASC : null);
-            const order = sort ? [["price", sort]] : undefined;
+            const order = priceOrder ? [["price", priceOrder]] : undefined;
 
             const rows = await Dish.findAll({
                 where,
                 include: [{ model: Category, as: "category", attributes: ["id", "name"] }],
                 order,
             });
+
             return rows.map(r => r.get());
         },
     };

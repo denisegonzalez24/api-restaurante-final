@@ -1,20 +1,22 @@
-export function makeUpdateItemQuantity({ orderCommandRepo, orderQueryRepo }) {
-    return async function updateItemQuantity(orderItemId, quantity) {
-        const q = Number(quantity);
-        if (!Number.isInteger(q) || q <= 0) {
-            const err = new Error("quantity inválida"); err.status = 400; throw err;
-        }
-        const result = await orderCommandRepo.updateItemQuantity(orderItemId, q);
-        const orderId = result?.orderId ?? result?.order_id ?? result?.order?.id;
+// src/application/order_service/addItemToOrder.command.js
+import { ApiError } from "../../shared/ApiError.js";
+import Status from "../../shared/status.js";
 
-        if (!orderId) {
-            // Fallback: si tu command no devuelve orderId, lo obtenemos por query
-            const itemModel = orderQueryRepo?.models?.OrderItem;
-            if (!itemModel) { const e = new Error("No se pudo determinar la orden del ítem"); e.status = 500; throw e; }
-            const row = await itemModel.findByPk(orderItemId);
-            if (!row) { const e = new Error("Item no encontrado"); e.status = 404; throw e; }
-            return orderQueryRepo.findById(row.orderId);
+export function makeAddItemToOrder({ orderQueryRepo, orderCommandRepo, dishQueryRepo }) {
+    return async function addItemToOrder(orderId, { dishId, quantity, notes }) {
+        const order = await orderQueryRepo.findById(orderId);
+        if (!order) throw new ApiError({ message: "Orden no encontrada", status: Status.notFound });
+        if (order.overallStatus?.name === "Closed") {
+            throw new ApiError({ message: "La orden está cerrada", status: Status.badRequest });
         }
+
+        const dish = await dishQueryRepo.findById(dishId);
+        if (!dish) throw new ApiError({ message: "Dish no encontrado", status: Status.notFound });
+        if (dish.available === false) {
+            throw new ApiError({ message: "Dish inactivo", status: Status.badRequest });
+        }
+
+        await orderCommandRepo.addItem(orderId, { dishId, quantity, notes });
         return orderQueryRepo.findById(orderId);
     };
 }

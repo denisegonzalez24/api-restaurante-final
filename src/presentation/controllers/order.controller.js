@@ -63,14 +63,16 @@ export function makeOrderController({
         updateItemStatus: async (req, res, next) => {
             try {
                 const { status } = req.body || {};
-                const full = await updateOrderItemStatus(req.params.itemId, status);
+                const { orderId, itemId } = req.params;
+                const full = await updateOrderItemStatus(orderId, itemId, status);
                 res.status(Status.ok).json(full);
             } catch (e) { next(e); }
         },
         updateItemQuantity: async (req, res, next) => {
             try {
                 const { quantity } = req.body || {};
-                const full = await updateItemQuantity(req.params.itemId, quantity);
+                const { orderId, itemId } = req.params;
+                const full = await updateItemQuantity(orderId, itemId, quantity);
                 res.status(Status.ok).json(full);
             } catch (e) { next(e); }
         }

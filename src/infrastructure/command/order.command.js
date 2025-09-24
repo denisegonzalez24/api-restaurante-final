@@ -23,26 +23,15 @@ export function orderCommandRepository({ models }) {
         const items = await OrderItem.findAll({ where: { orderId }, transaction: t });
         if (items.length === 0) return;
 
-        const statuses = Array.from(new Set(items.map((i) => i.statusId).filter(Boolean)));
-        let newStatusId;
+        const ids = items.map(i => i.statusId).filter(Boolean);
+        const minStatusId = Math.min(...ids);
 
-        if (statuses.length === 1) {
-            newStatusId = statuses[0];
-        } else {
-            const current = await Order.findByPk(orderId, { transaction: t });
-            newStatusId = current?.overallStatusId ?? null; // conserva el actual
-        }
-        if (newStatusId) {
-            await Order.update(
-                { overallStatusId: newStatusId },
-                { where: { id: orderId }, transaction: t }
-            );
-        }
+        await Order.update(
+            { overallStatusId: minStatusId },
+            { where: { id: orderId }, transaction: t }
+        );
     }
-
     return {
-
-        // Crea la orden con items (todos en Pending) y recalcula total/estado
         async create(body) {
             return sequelize.transaction(async (t) => {
                 const stPending = await Status.findOne({ where: { name: "Pending" }, transaction: t });
@@ -62,9 +51,7 @@ export function orderCommandRepository({ models }) {
                 const items = Array.isArray(body?.items) ? body.items : [];
                 for (const it of items) {
                     const dish = await Dish.findByPk(it.dishId, { transaction: t });
-                    if (!dish) {
-                        const e = new Error("Dish no encontrado"); e.status = 404; throw e;
-                    }
+                    if (!dish) throw new Error("DishNotFound");
                     const qty = Math.max(1, Number(it.quantity || 1));
                     await OrderItem.create(
                         {
@@ -81,18 +68,17 @@ export function orderCommandRepository({ models }) {
 
                 await recalcTotal(order.id, t);
                 await computeOrderStatus(order.id, t);
-                return order.get();
+                return order.get(); // { id, ... }
             });
         },
 
-        // Agrega un plato a la orden (item en Pending) y recalcula total/estado
         async addItem(orderId, { dishId, quantity = 1, notes = null }) {
             return sequelize.transaction(async (t) => {
                 const order = await Order.findByPk(orderId, { transaction: t });
-                if (!order) { const e = new Error("Orden no encontrada"); e.status = 404; throw e; }
+                if (!order) throw new Error("OrderNotFound");
 
                 const dish = await Dish.findByPk(dishId, { transaction: t });
-                if (!dish) { const e = new Error("Dish no encontrado"); e.status = 404; throw e; }
+                if (!dish) throw new Error("DishNotFound");
 
                 const stPending = await Status.findOne({ where: { name: "Pending" }, transaction: t });
 
@@ -110,22 +96,20 @@ export function orderCommandRepository({ models }) {
 
                 await recalcTotal(order.id, t);
                 await computeOrderStatus(order.id, t);
-                // devolvemos orderId por conveniencia (no es obligatorio)
                 return { orderId: order.id };
             });
         },
 
-        // Cambia el estado de un ítem y sincroniza el estado de la orden si corresponde
         async updateItemStatus(orderItemId, status) {
             return sequelize.transaction(async (t) => {
                 const targetStatus =
                     Number.isFinite(+status)
                         ? await Status.findByPk(+status, { transaction: t })
                         : await Status.findOne({ where: { name: status }, transaction: t });
-                if (!targetStatus) { const e = new Error("Status inválido"); e.status = 400; throw e; }
+                if (!targetStatus) throw new Error("InvalidStatus");
 
                 const it = await OrderItem.findByPk(orderItemId, { transaction: t });
-                if (!it) { const e = new Error("Item no encontrado"); e.status = 404; throw e; }
+                if (!it) throw new Error("OrderItemNotFound");
 
                 await it.update(
                     { statusId: targetStatus.id, updateDate: Sequelize.fn("NOW") },
@@ -137,19 +121,18 @@ export function orderCommandRepository({ models }) {
             });
         },
 
-        // NUEVO: cambia la cantidad de un ítem y recalcula total/estado
         async updateItemQuantity(orderItemId, quantity) {
             return sequelize.transaction(async (t) => {
+                // Validación fina (>=1 entero) debería estar en el use-case;
+                // aquí solo evitamos números imposibles por seguridad:
                 const q = Number(quantity);
-                if (!Number.isInteger(q) || q <= 0) {
-                    const e = new Error("quantity inválida"); e.status = 400; throw e;
-                }
+                if (!Number.isFinite(q) || q <= 0) throw new Error("InvalidQuantity");
 
                 const it = await OrderItem.findByPk(orderItemId, { transaction: t });
-                if (!it) { const e = new Error("Item no encontrado"); e.status = 404; throw e; }
+                if (!it) throw new Error("OrderItemNotFound");
 
                 await it.update(
-                    { quantity: q, updateDate: Sequelize.fn("NOW") },
+                    { quantity: Math.trunc(q), updateDate: Sequelize.fn("NOW") },
                     { transaction: t }
                 );
 
@@ -158,6 +141,5 @@ export function orderCommandRepository({ models }) {
                 return { orderId: it.orderId };
             });
         },
-
     };
 }

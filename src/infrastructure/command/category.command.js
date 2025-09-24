@@ -26,8 +26,9 @@ export function categoryCommandRepository({ models }) {
         },
 
         async deleteById(id, options = {}) {
-            await Category.destroy({ where: { id }, transaction: options.transaction });
-        },
+            const count = await Category.destroy({ where: { id }, transaction: options.transaction });
+            return count > 0;
+        }
     };
 }
 

@@ -9,11 +9,11 @@ export function orderQueryRepository({ models }) {
         async findById(id) {
             const row = await Order.findByPk(id, {
                 include: [
-                    { model: Status, as: "overallStatus", attributes: ["id", "name"] }, // <- alias correcto
+                    { model: Status, as: "overallStatus", attributes: ["id", "name"] },
                     {
                         model: OrderItem, as: "items",
                         include: [
-                            { model: Status, as: "status", attributes: ["id", "name"] },    // si OrderItem->Status se llama 'status'
+                            { model: Status, as: "status", attributes: ["id", "name"] },
                             {
                                 model: Dish, as: "dish", attributes: ["id", "name", "price"],
                                 include: [{ model: Category, as: "category", attributes: ["id", "name"] }]
