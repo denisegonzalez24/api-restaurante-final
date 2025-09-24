@@ -31,6 +31,7 @@ import { makeRemoveItemFromOrder } from "./application/order_service/removeItemF
 import { makeUpdateOrderItemStatus } from "./application/order_service/updateOrderItemStatus.command.js";
 import { makeCategoryRoutes } from "./presentation/routes/category.routes.js";
 import { makeDishRoutes } from "./presentation/routes/dish.routes.js";
+import { makeUpdateOrderItemQuantity } from "./application/order_service/updateOrderItemQuantity.command.js";
 
 export async function buildContainer() {
 
@@ -70,11 +71,12 @@ export async function buildContainer() {
     const addItemToOrder = makeAddItemToOrder({ orderCommandRepo, orderQueryRepo });
     const removeItemFromOrder = makeRemoveItemFromOrder({ orderCommandRepo });
     const updateOrderItemStatus = makeUpdateOrderItemStatus({ orderCommandRepo, orderQueryRepo });
+    const updateOrderItemQuantity = makeUpdateOrderItemQuantity({ orderQueryRepo, orderCommandRepo });
 
 
     const dishController = makeDishController({ createDish, updateDish, listDishes });
     const catalogController = makeCatalogController({ listCategories, listDeliveryTypes, listStatuses, });
-    const orderController = makeOrderController({ createOrder, listOrders, getOrderById, addItemToOrder, removeItemFromOrder, updateOrderItemStatus });
+    const orderController = makeOrderController({ createOrder, listOrders, getOrderById, addItemToOrder, removeItemFromOrder, updateOrderItemStatus, updateOrderItemQuantity });
     const categoryController = makeCategoryController({ listCategories, getCategoryById, createCategory, updateCategory, deleteCategory, });
 
 
@@ -88,6 +90,7 @@ export async function buildContainer() {
             dish: dishRouter,
             catalog: catalogRouter,
             order: orderRouter,
+            category: categoryRouter
         },
     };
 }

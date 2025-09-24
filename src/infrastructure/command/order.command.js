@@ -22,10 +22,8 @@ export function orderCommandRepository({ models }) {
     async function computeOrderStatus(orderId, t) {
         const items = await OrderItem.findAll({ where: { orderId }, transaction: t });
         if (items.length === 0) return;
-
         const ids = items.map(i => i.statusId).filter(Boolean);
         const minStatusId = Math.min(...ids);
-
         await Order.update(
             { overallStatusId: minStatusId },
             { where: { id: orderId }, transaction: t }

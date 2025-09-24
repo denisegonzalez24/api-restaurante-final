@@ -1,17 +1,6 @@
 // src/presentation/controllers/order.controller.js
 import Status from "../../shared/status.js";
 
-/**
- * Espera funciones (use cases), NO repos:
- * {
- *   createOrder,            // (dto) => Promise<OrderFull>
- *   listOrders,             // ({ date, status }) => Promise<OrderSummary[]>
- *   getOrderById,           // (orderId) => Promise<OrderFull|null>
- *   addItemToOrder,         // (orderId, { dishId, quantity, notes }) => Promise<OrderFull>
- *   removeItemFromOrder,    // (orderItemId) => Promise<void>
- *   updateOrderItemStatus,  // (orderItemId, status) => Promise<OrderFull>
- * }
- */
 export function makeOrderController({
     createOrder,
     listOrders,
@@ -19,7 +8,7 @@ export function makeOrderController({
     addItemToOrder,
     removeItemFromOrder,
     updateOrderItemStatus,
-    updateItemQuantity
+    updateOrderItemQuantity
 }) {
     return {
         create: async (req, res, next) => {
@@ -72,7 +61,7 @@ export function makeOrderController({
             try {
                 const { quantity } = req.body || {};
                 const { orderId, itemId } = req.params;
-                const full = await updateItemQuantity(orderId, itemId, quantity);
+                const full = await updateOrderItemQuantity(orderId, itemId, quantity);
                 res.status(Status.ok).json(full);
             } catch (e) { next(e); }
         }

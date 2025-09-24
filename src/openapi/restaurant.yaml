@@ -1,13 +1,14 @@
 openapi: 3.0.1
 info:
   title: Restaurant API
-  description: API para la gestión de platos en un restaurante
+  description: API completa para la gestión de restaurante - platos, categorías, órdenes y entregas
   version: '1.0'
   contact:
     name: Restaurant API Support
-    email: lolivera@unaj.edu.ar
+    email: support@restaurant.com
 
 paths:
+  # ========== DISH ENDPOINTS ==========
   /api/v1/Dish:
     post:
       tags:
@@ -20,10 +21,6 @@ paths:
         - El nombre del plato debe ser único
         - El precio debe ser mayor a 0
         - La categoría debe existir en el sistema
-        
-        **Casos de uso:**
-        - Agregar nuevos platos al menú
-        - Platos estacionales o especiales del chef
       requestBody:
         description: Datos del plato a crear
         required: true
@@ -94,13 +91,6 @@ paths:
         
         **Ordenamiento:**
         - Por precio ascendente o descendente
-        - Sin ordenamiento específico
-        
-        **Casos de uso:**
-        - Mostrar menú completo a los clientes
-        - Buscar platos específicos
-        - Filtrar por categorías (entrantes, principales, postres)
-        - Administración del menú (incluyendo platos inactivos)
       parameters:
         - name: name
           in: query
@@ -178,6 +168,62 @@ paths:
                 message: "Parámetros de ordenamiento inválidos"
 
   /api/v1/Dish/{id}:
+    get:
+      tags:
+        - Dish
+      summary: Obtener plato por ID
+      description: |
+        Obtiene los detalles completos de un plato específico.
+        
+        **Casos de uso:**
+        - Ver detalles de un plato antes de agregarlo a la orden
+        - Mostrar información detallada en el menú
+        - Verificación de disponibilidad
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único del plato
+          schema:
+            type: string
+            format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        '200':
+          description: Plato encontrado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DishResponse'
+              example:
+                id: "123e4567-e89b-12d3-a456-426614174000"
+                name: "Pizza Margherita"
+                description: "Pizza clásica con salsa de tomate, mozzarella fresca, albahaca y aceite de oliva extra virgen"
+                price: 850.50
+                category:
+                  id: 1
+                  name: "Pizzas"
+                image: "https://restaurant.com/images/pizza-margherita.jpg"
+                isActive: true
+                createdAt: "2024-03-15T10:30:00Z"
+                updatedAt: "2024-03-15T10:30:00Z"
+        '400':
+          description: ID de plato inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              example:
+                message: "Formato de ID inválido"
+        '404':
+          description: Plato no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              example:
+                message: "Plato no encontrado"
+
     put:
       tags:
         - Dish
@@ -190,13 +236,6 @@ paths:
         - Si se cambia el nombre, debe ser único
         - El precio debe ser mayor a 0
         - La categoría debe existir
-        
-        **Casos de uso:**
-        - Actualizar precios de platos
-        - Modificar descripciones o ingredientes
-        - Cambiar categorías de platos
-        - Activar/desactivar platos del menú
-        - Actualizar imágenes de platos
       parameters:
         - name: id
           in: path
@@ -264,6 +303,553 @@ paths:
               example:
                 message: "Ya existe un plato con ese nombre"
 
+    options:
+      tags:
+        - Dish
+      summary: Eliminar plato
+      description: |
+        Elimina un plato del menú del restaurante.
+        
+        **Importante:** 
+        - Solo se pueden eliminar platos que no estén en órdenes activas
+        - Típicamente se recomienda desactivar (isActive=false) en lugar de eliminar
+        
+        **Casos de error 409:**
+        - El plato está incluido en órdenes pendientes o en proceso
+        - El plato tiene dependencias que impiden su eliminación
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID único del plato a eliminar
+          schema:
+            type: string
+            format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        '200':
+          description: Plato eliminado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DishResponse'
+              example:
+                id: "123e4567-e89b-12d3-a456-426614174000"
+                name: "Pizza Margherita"
+                description: "Pizza clásica con salsa de tomate, mozzarella fresca, albahaca y aceite de oliva extra virgen"
+                price: 850.50
+                category:
+                  id: 1
+                  name: "Pizzas"
+                image: "https://restaurant.com/images/pizza-margherita.jpg"
+                isActive: false
+                createdAt: "2024-03-15T10:30:00Z"
+                updatedAt: "2024-03-15T16:20:00Z"
+        '404':
+          description: Plato no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              example:
+                message: "Plato no encontrado"
+        '409':
+          description: No se puede eliminar - plato en uso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              example:
+                message: "No se puede eliminar el plato porque está incluido en órdenes activas"
+
+  # ========== CATEGORY ENDPOINTS ==========
+  /api/v1/Category:
+    options:
+      tags:
+        - Dish
+      summary: Obtener categorías de platos
+      description: |
+        Obtiene todas las categorías disponibles para clasificar platos.
+        
+        **Casos de uso:**
+        - Mostrar categorías en formularios de creación/edición de platos
+        - Filtros de búsqueda en el menú
+        - Organización del menú por secciones
+      responses:
+        '200':
+          description: Lista de categorías obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CategoryResponse'
+              example:
+                - id: 1
+                  name: "Pizzas"
+                  description: "Pizzas artesanales con masa tradicional"
+                  order: 1
+                - id: 2
+                  name: "Pastas"
+                  description: "Pastas frescas caseras"
+                  order: 2
+                - id: 3
+                  name: "Ensaladas"
+                  description: "Ensaladas frescas y saludables"
+                  order: 3
+                - id: 4
+                  name: "Postres"
+                  description: "Postres caseros y dulces tradicionales"
+                  order: 4
+
+  # ========== DELIVERY TYPE ENDPOINTS ==========
+  /api/v1/DeliveryType:
+    options:
+      tags:
+        - Dish
+      summary: Obtener tipos de entrega
+      description: |
+        Obtiene todos los tipos de entrega disponibles para las órdenes.
+        
+        **Casos de uso:**
+        - Mostrar opciones de entrega al cliente durante el pedido
+        - Configurar diferentes métodos de entrega
+        - Calcular costos de envío según el tipo
+      responses:
+        '200':
+          description: Lista de tipos de entrega obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GenericResponse'
+              example:
+                - id: 1
+                  name: "Delivery"
+                - id: 2
+                  name: "Retiro en local"
+                - id: 3
+                  name: "Comida en el local"
+
+  # ========== STATUS ENDPOINTS ==========
+  /api/v1/Status:
+    options:
+      tags:
+        - Dish
+      summary: Obtener estados de órdenes
+      description: |
+        Obtiene todos los estados posibles para las órdenes y sus items.
+        
+        **Estados típicos:**
+        - Pendiente: orden recién creada
+        - En preparación: cocina comenzó a preparar
+        - Listo: orden lista para entregar
+        - Entregado: orden completada
+        - Cancelado: orden cancelada
+      responses:
+        '200':
+          description: Lista de estados obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GenericResponse'
+              example:
+                - id: 1
+                  name: "Pendiente"
+                - id: 2
+                  name: "En preparación"
+                - id: 3
+                  name: "Listo"
+                - id: 4
+                  name: "Entregado"
+                - id: 5
+                  name: "Cancelado"
+
+  # ========== ORDER ENDPOINTS ==========
+  /api/v1/Order:
+    post:
+      tags:
+        - Order
+      summary: Crear nueva orden
+      description: |
+        Crea una nueva orden con los platos solicitados por el cliente.
+        
+        **Proceso:**
+        1. Se valida que todos los platos existan y estén activos
+        2. Se calcula el total de la orden
+        3. Se asigna un número de orden único
+        4. Se crean los items individuales de la orden
+        
+        **Validaciones:**
+        - Los platos deben existir y estar activos
+        - Las cantidades deben ser mayores a 0
+        - Debe especificarse tipo de entrega
+      requestBody:
+        description: Datos de la nueva orden
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
+            example:
+              items:
+                - id: "123e4567-e89b-12d3-a456-426614174000"
+                  quantity: 2
+                  notes: "Sin albahaca, por favor"
+                - id: "987fcdeb-51a2-43d7-8f9e-123456789abc"
+                  quantity: 1
+                  notes: "Bien cocida"
+              delivery:
+                id: 1
+                to: "Av. Corrientes 1234, Buenos Aires"
+              notes: "Timbre: Departamento 5B"
+      responses:
+        '201':
+          description: Orden creada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCreateReponse'
+              example:
+                orderNumber: 1001
+                totalAmount: 1800.50
+                createdAt: "2024-03-15T14:30:00Z"
+        '400':
+          description: Datos de orden inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              examples:
+                invalid_dish:
+                  summary: Plato no válido
+                  value:
+                    message: "El plato especificado no existe o no está disponible"
+                invalid_quantity:
+                  summary: Cantidad inválida
+                  value:
+                    message: "La cantidad debe ser mayor a 0"
+                missing_delivery:
+                  summary: Tipo de entrega faltante
+                  value:
+                    message: "Debe especificar un tipo de entrega válido"
+
+    get:
+      tags:
+        - Order
+      summary: Buscar órdenes
+      description: |
+        Obtiene una lista de órdenes con filtros opcionales.
+        
+        **Filtros disponibles:**
+        - Por rango de fechas (desde/hasta)
+        - Por estado de la orden
+        
+        **Casos de uso:**
+        - Ver órdenes del día para cocina
+        - Historial de órdenes del cliente
+        - Reportes de ventas por período
+        - Seguimiento de órdenes pendientes
+      parameters:
+        - name: from
+          in: query
+          description: Fecha y hora de inicio para filtrar órdenes
+          schema:
+            type: string
+            format: date-time
+          example: "2024-03-15T00:00:00Z"
+        - name: to
+          in: query
+          description: Fecha y hora de fin para filtrar órdenes
+          schema:
+            type: string
+            format: date-time
+          example: "2024-03-15T23:59:59Z"
+        - name: status
+          in: query
+          description: Filtrar por estado de la orden
+          schema:
+            type: integer
+            format: int32
+          example: 2
+      responses:
+        '200':
+          description: Lista de órdenes obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderDetailsResponse'
+              example:
+                - orderNumber: 1001
+                  totalAmount: 1800.50
+                  deliveryTo: "Av. Corrientes 1234, Buenos Aires"
+                  notes: "Timbre: Departamento 5B"
+                  status:
+                    id: 2
+                    name: "En preparación"
+                  deliveryType:
+                    id: 1
+                    name: "Delivery"
+                  items:
+                    - id: 1
+                      quantity: 2
+                      notes: "Sin albahaca, por favor"
+                      status:
+                        id: 2
+                        name: "En preparación"
+                      dish:
+                        id: "123e4567-e89b-12d3-a456-426614174000"
+                        name: "Pizza Margherita"
+                        image: "https://restaurant.com/images/pizza-margherita.jpg"
+                    - id: 2
+                      quantity: 1
+                      notes: "Bien cocida"
+                      status:
+                        id: 2
+                        name: "En preparación"
+                      dish:
+                        id: "987fcdeb-51a2-43d7-8f9e-123456789abc"
+                        name: "Lasagna Bolognesa"
+                        image: "https://restaurant.com/images/lasagna-bolognesa.jpg"
+                  createdAt: "2024-03-15T14:30:00Z"
+                  updatedAt: "2024-03-15T14:35:00Z"
+        '400':
+          description: Parámetros de búsqueda inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              example:
+                message: "Rango de fechas inválido"
+
+    options:
+      tags:
+        - Order
+      summary: Actualizar orden existente
+      description: |
+        Actualiza los items de una orden existente.
+        
+        **Limitaciones:**
+        - Solo se pueden actualizar órdenes que no esten cerradas
+        - No se pueden agregar items de platos inactivos
+        - El total se recalcula automáticamente
+        
+        **Casos de uso:**
+        - Cliente quiere agregar más platos a su orden
+        - Modificar cantidades antes de que comience la preparación
+        - Cambiar notas especiales de los platos
+      requestBody:
+        description: Items actualizados de la orden
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderUpdateRequest'
+            example:
+              items:
+                - id: "123e4567-e89b-12d3-a456-426614174000"
+                  quantity: 3
+                  notes: "Sin albahaca, extra queso"
+                - id: "456e7890-a12b-34c5-d678-901234567890"
+                  quantity: 1
+                  notes: "Para compartir"
+      responses:
+        '200':
+          description: Orden actualizada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderUpdateReponse'
+              example:
+                orderNumber: 1001
+                totalAmount: 2650.75
+                updateAt: "2024-03-15T14:40:00Z"
+        '400':
+          description: Datos de actualización inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              examples:
+                order_in_progress:
+                  summary: Orden en preparación
+                  value:
+                    message: "No se puede modificar una orden que ya está en preparación"
+                invalid_dish:
+                  summary: Plato no disponible
+                  value:
+                    message: "El plato especificado no está disponible"
+
+  /api/v1/Order/{id}:
+    options:
+      tags:
+        - Order
+      summary: Obtener orden por número
+      description: |
+        Obtiene los detalles completos de una orden específica.
+        
+        **Información incluida:**
+        - Detalles de la orden (número, total, estado)
+        - Información de entrega
+        - Lista completa de items con sus estados individuales
+        - Información de cada plato incluido
+        
+        **Casos de uso:**
+        - Seguimiento de orden por parte del cliente
+        - Detalles para cocina y entrega
+        - Historial detallado de órdenes
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Número de orden único
+          schema:
+            type: integer
+            format: int64
+          example: 1001
+      responses:
+        '200':
+          description: Orden encontrada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDetailsResponse'
+              example:
+                orderNumber: 1001
+                totalAmount: 1800.50
+                deliveryTo: "Av. Corrientes 1234, Buenos Aires"
+                notes: "Timbre: Departamento 5B"
+                status:
+                  id: 3
+                  name: "Listo"
+                deliveryType:
+                  id: 1
+                  name: "Delivery"
+                items:
+                  - id: 1
+                    quantity: 2
+                    notes: "Sin albahaca, por favor"
+                    status:
+                      id: 3
+                      name: "Listo"
+                    dish:
+                      id: "123e4567-e89b-12d3-a456-426614174000"
+                      name: "Pizza Margherita"
+                      image: "https://restaurant.com/images/pizza-margherita.jpg"
+                  - id: 2
+                    quantity: 1
+                    notes: "Bien cocida"
+                    status:
+                      id: 3
+                      name: "Listo"
+                    dish:
+                      id: "987fcdeb-51a2-43d7-8f9e-123456789abc"
+                      name: "Lasagna Bolognesa"
+                      image: "https://restaurant.com/images/lasagna-bolognesa.jpg"
+                createdAt: "2024-03-15T14:30:00Z"
+                updatedAt: "2024-03-15T15:15:00Z"
+        '404':
+          description: Orden no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              example:
+                message: "Orden no encontrada"
+
+  /api/v1/Order/{id}/item/{itemId}:
+    options:
+      tags:
+        - Order
+      summary: Actualizar estado de item individual
+      description: |
+        Actualiza el estado de un item específico dentro de una orden.
+        
+        **Casos de uso típicos:**
+        - Cocina marca un plato como "En preparación"
+        - Cocina marca un plato como "Listo"  
+        - Cancelar un item específico si no se puede preparar
+        
+        **Flujo de estados típico:**
+        1. Pendiente → En preparación (cocina comienza)
+        2. En preparación → Listo (plato terminado)
+        3. Listo → Entregado (entregado al cliente)
+        
+        **Nota:** El estado de la orden general se actualiza automáticamente 
+        basado en el estado de todos sus items.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Número de orden
+          schema:
+            type: integer
+            format: int64
+          example: 1001
+        - name: itemId
+          in: path
+          required: true
+          description: ID del item dentro de la orden
+          schema:
+            type: integer
+            format: int64
+          example: 1
+      requestBody:
+        description: Nuevo estado para el item
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderItemUpdateRequest'
+            example:
+              status: 3
+      responses:
+        '200':
+          description: Estado del item actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderUpdateReponse'
+              example:
+                orderNumber: 1001
+                totalAmount: 1800.50
+                updateAt: "2024-03-15T15:10:00Z"
+        '400':
+          description: Estado inválido o transición no permitida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              examples:
+                invalid_status:
+                  summary: Estado inválido
+                  value:
+                    message: "El estado especificado no es válido"
+                invalid_transition:
+                  summary: Transición no permitida
+                  value:
+                    message: "No se puede cambiar de 'Entregado' a 'En preparación'"
+        '404':
+          description: Orden o item no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              examples:
+                order_not_found:
+                  summary: Orden no encontrada
+                  value:
+                    message: "Orden no encontrada"
+                item_not_found:
+                  summary: Item no encontrado
+                  value:
+                    message: "Item no encontrado en la orden"
+
 components:
   schemas:
     ApiError:
@@ -277,6 +863,7 @@ components:
           example: "Ya existe un plato con ese nombre"
       additionalProperties: false
 
+    # ========== DISH SCHEMAS ==========
     DishRequest:
       type: object
       description: Datos requeridos para crear un nuevo plato
@@ -289,6 +876,7 @@ components:
           type: string
           description: Nombre del plato (debe ser único)
           maxLength: 100
+          nullable: true
           example: "Pizza Margherita"
         description:
           type: string
@@ -328,6 +916,7 @@ components:
           type: string
           description: Nombre del plato (debe ser único)
           maxLength: 100
+          nullable: true
           example: "Pizza Margherita Premium"
         description:
           type: string
@@ -370,6 +959,7 @@ components:
         name:
           type: string
           description: Nombre del plato
+          nullable: true
           example: "Pizza Margherita"
         description:
           type: string
@@ -404,9 +994,57 @@ components:
           example: "2024-03-15T10:30:00Z"
       additionalProperties: false
 
+    DishShortResponse:
+      type: object
+      description: Información resumida de un plato para mostrar en órdenes
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Identificador único del plato
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        name:
+          type: string
+          description: Nombre del plato
+          nullable: true
+          example: "Pizza Margherita"
+        image:
+          type: string
+          description: URL de la imagen del plato
+          nullable: true
+          example: "https://restaurant.com/images/pizza-margherita.jpg"
+      additionalProperties: false
+
+    # ========== CATEGORY SCHEMAS ==========
+    CategoryResponse:
+      type: object
+      description: Información de una categoría de platos
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: ID único de la categoría
+          example: 1
+        name:
+          type: string
+          description: Nombre de la categoría
+          nullable: true
+          example: "Pizzas"
+        description:
+          type: string
+          description: Descripción de la categoría
+          nullable: true
+          example: "Pizzas artesanales con masa tradicional"
+        order:
+          type: integer
+          format: int32
+          description: Orden de visualización de la categoría
+          example: 1
+      additionalProperties: false
+
     GenericResponse:
       type: object
-      description: Respuesta genérica para entidades relacionadas
+      description: Respuesta genérica para entidades relacionadas (categorías, estados, tipos de entrega)
       properties:
         id:
           type: integer
@@ -418,4 +1056,223 @@ components:
           description: Nombre de la entidad
           nullable: true
           example: "Pizzas"
+      additionalProperties: false
+
+    # ========== ORDER SCHEMAS ==========
+    OrderRequest:
+      type: object
+      description: Datos requeridos para crear una nueva orden
+      required:
+        - items
+        - delivery
+      properties:
+        items:
+          type: array
+          description: Lista de platos solicitados en la orden
+          items:
+            $ref: '#/components/schemas/Items'
+          nullable: true
+          example:
+            - id: "123e4567-e89b-12d3-a456-426614174000"
+              quantity: 2
+              notes: "Sin albahaca, por favor"
+            - id: "987fcdeb-51a2-43d7-8f9e-123456789abc"
+              quantity: 1
+              notes: "Bien cocida"
+        delivery:
+          $ref: '#/components/schemas/Delivery'
+        notes:
+          type: string
+          description: Notas generales para toda la orden
+          nullable: true
+          example: "Timbre: Departamento 5B"
+      additionalProperties: false
+
+    OrderUpdateRequest:
+      type: object
+      description: Datos para actualizar items de una orden existente
+      properties:
+        items:
+          type: array
+          description: Lista actualizada de platos en la orden
+          items:
+            $ref: '#/components/schemas/Items'
+          nullable: true
+          example:
+            - id: "123e4567-e89b-12d3-a456-426614174000"
+              quantity: 3
+              notes: "Sin albahaca, extra queso"
+            - id: "456e7890-a12b-34c5-d678-901234567890"
+              quantity: 1
+              notes: "Para compartir"
+      additionalProperties: false
+
+    OrderCreateReponse:
+      type: object
+      description: Respuesta al crear una nueva orden
+      properties:
+        orderNumber:
+          type: integer
+          format: int64
+          description: Número único de la orden generado por el sistema
+          example: 1001
+        totalAmount:
+          type: number
+          format: double
+          description: Monto total de la orden
+          example: 1800.50
+        createdAt:
+          type: string
+          format: date-time
+          description: Fecha y hora de creación de la orden
+          example: "2024-03-15T14:30:00Z"
+      additionalProperties: false
+
+    OrderUpdateReponse:
+      type: object
+      description: Respuesta al actualizar una orden existente
+      properties:
+        orderNumber:
+          type: integer
+          format: int64
+          description: Número de la orden actualizada
+          example: 1001
+        totalAmount:
+          type: number
+          format: double
+          description: Nuevo monto total de la orden
+          example: 2650.75
+        updateAt:
+          type: string
+          format: date-time
+          description: Fecha y hora de la última actualización
+          example: "2024-03-15T14:40:00Z"
+      additionalProperties: false
+
+    OrderDetailsResponse:
+      type: object
+      description: Información completa de una orden con todos sus items
+      properties:
+        orderNumber:
+          type: integer
+          format: int64
+          description: Número único de la orden
+          example: 1001
+        totalAmount:
+          type: number
+          format: double
+          description: Monto total de la orden
+          example: 1800.50
+        deliveryTo:
+          type: string
+          description: Dirección de entrega (si aplica)
+          nullable: true
+          example: "Av. Corrientes 1234, Buenos Aires"
+        notes:
+          type: string
+          description: Notas generales de la orden
+          nullable: true
+          example: "Timbre: Departamento 5B"
+        status:
+          $ref: '#/components/schemas/GenericResponse'
+        deliveryType:
+          $ref: '#/components/schemas/GenericResponse'
+        items:
+          type: array
+          description: Lista de items incluidos en la orden
+          items:
+            $ref: '#/components/schemas/OrderItemResponse'
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+          description: Fecha y hora de creación de la orden
+          example: "2024-03-15T14:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Fecha y hora de última actualización
+          example: "2024-03-15T15:15:00Z"
+      additionalProperties: false
+
+    OrderItemResponse:
+      type: object
+      description: Información de un item individual dentro de una orden
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: ID único del item dentro de la orden
+          example: 1
+        quantity:
+          type: integer
+          format: int32
+          description: Cantidad solicitada del plato
+          example: 2
+        notes:
+          type: string
+          description: Notas específicas para este item
+          nullable: true
+          example: "Sin albahaca, por favor"
+        status:
+          $ref: '#/components/schemas/GenericResponse'
+        dish:
+          $ref: '#/components/schemas/DishShortResponse'
+      additionalProperties: false
+
+    OrderItemUpdateRequest:
+      type: object
+      description: Datos para actualizar el estado de un item individual
+      required:
+        - status
+      properties:
+        status:
+          type: integer
+          format: int32
+          description: Nuevo estado del item (1=Pendiente, 2=En preparación, 3=Listo, 4=Entregado, 5=Cancelado)
+          example: 3
+      additionalProperties: false
+
+    # ========== SUPPORTING SCHEMAS ==========
+    Items:
+      type: object
+      description: Información de un plato solicitado en una orden
+      required:
+        - id
+        - quantity
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ID del plato solicitado
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        quantity:
+          type: integer
+          format: int32
+          description: Cantidad solicitada
+          minimum: 1
+          example: 2
+        notes:
+          type: string
+          description: Notas especiales para la preparación del plato
+          nullable: true
+          example: "Sin albahaca, por favor"
+      additionalProperties: false
+
+    Delivery:
+      type: object
+      description: Información de entrega para la orden
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: ID del tipo de entrega (1=Delivery, 2=Retiro en local, 3=Comida en el local)
+          example: 1
+        to:
+          type: string
+          description: Dirección de entrega (requerido solo para delivery)
+          nullable: true
+          example: "Av. Corrientes 1234, Buenos Aires"
       additionalProperties: false
