@@ -4,23 +4,19 @@ export function orderQueryRepository({ models }) {
     const { Order, OrderItem, Dish, Status, DeliveryType, Category } = models;
 
     return {
-        models, // lo usás en el controller para leer un item suelto
+        models,
 
         async findById(id) {
             const row = await Order.findByPk(id, {
                 include: [
-                    { model: Status, as: "status", attributes: ["id", "name"] },
-                    { model: DeliveryType, as: "deliveryType", attributes: ["id", "name"] },
+                    { model: Status, as: "overallStatus", attributes: ["id", "name"] }, // <- alias correcto
                     {
-                        model: OrderItem,
-                        as: "items",
+                        model: OrderItem, as: "items",
                         include: [
-                            { model: Status, as: "status", attributes: ["id", "name"] },
+                            { model: Status, as: "status", attributes: ["id", "name"] },    // si OrderItem->Status se llama 'status'
                             {
-                                model: Dish,
-                                as: "dish",
-                                attributes: ["id", "name", "price", "imageUrl", "available"],
-                                include: [{ model: Category, as: "category", attributes: ["id", "name"] }],
+                                model: Dish, as: "dish", attributes: ["id", "name", "price"],
+                                include: [{ model: Category, as: "category", attributes: ["id", "name"] }]
                             },
                         ],
                     },
@@ -30,7 +26,6 @@ export function orderQueryRepository({ models }) {
             return row ? row.get() : null;
         },
 
-        // filtros: date (YYYY-MM-DD), status (id o nombre)
         async findAll({ date, status } = {}) {
             const where = {};
             if (date) {
@@ -44,7 +39,7 @@ export function orderQueryRepository({ models }) {
                 if (Number.isFinite(+status)) {
                     where.overallStatusId = +status;
                 } else {
-                    // filtramos por join a status con nombre
+
                     const sts = await Status.findOne({ where: { name: status } });
                     where.overallStatusId = sts?.id ?? -1;
                 }

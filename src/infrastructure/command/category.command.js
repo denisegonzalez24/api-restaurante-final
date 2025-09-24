@@ -1,14 +1,4 @@
-// src/infrastructure/command/categoryCommandRepo.js
 
-/**
- * Repo de comandos para Category.
- * Métodos:
- *  - create({ name, description, order }, { transaction })
- *  - updateById(id, { name?, description?, order? }, { transaction })
- *  - deleteById(id, { transaction })
- *
- * Devuelve plain objects (row.get()) para encajar con tus mappers/UCs.
- */
 export function categoryCommandRepository({ models }) {
     const { Category } = models;
 

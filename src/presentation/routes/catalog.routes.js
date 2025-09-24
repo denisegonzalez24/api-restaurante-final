@@ -6,3 +6,4 @@ export function makeCatalogRoutes(controller) {
     r.get("/Status", controller.getStatuses);
     return r;
 }
+export default makeCatalogRoutes;

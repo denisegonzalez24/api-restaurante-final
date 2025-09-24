@@ -1,5 +1,8 @@
-export const makeListCategories = ({ categoryRepoQuery }) => async () => {
-    const cats = await categoryRepoQuery.findAll();
-    // ya vienen ordenadas por "order"
-    return cats.map(c => ({ id: c.id, name: c.name, description: c.description, order: c.order }));
-};
+import { assertCategoryRepoQuery } from "../../domain/ports/categoryRepoQuery.port.js";
+
+export function makeListCategories({ categoryQueryRepo }) {
+    const repo = assertCategoryRepoQuery(categoryQueryRepo);
+    return async function listCategories() {
+        return repo.findAll();
+    };
+}

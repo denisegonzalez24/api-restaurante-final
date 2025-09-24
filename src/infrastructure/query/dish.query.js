@@ -1,4 +1,5 @@
 import { Op } from "sequelize";
+import { ORDER } from "../../shared/constants.js";
 
 
 export function dishQueryRepository({ models }) {
@@ -19,7 +20,8 @@ export function dishQueryRepository({ models }) {
             if (categoryId) where.categoryId = categoryId;
             if (onlyActive) where.available = true;
 
-            const order = priceOrder ? [["price", priceOrder === ORDER.DESC ? ORDER.DESC : ORDER.ASC]] : undefined;
+            const sort = (sortByPrice === "desc" ? ORDER.DESC : sortByPrice === "asc" ? ORDER.ASC : null);
+            const order = sort ? [["price", sort]] : undefined;
 
             const rows = await Dish.findAll({
                 where,

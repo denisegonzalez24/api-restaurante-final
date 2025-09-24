@@ -1,15 +1,8 @@
-// src/application/catalog/listStatuses.query.js
+import { assertStatusRepoQuery } from "../../domain/ports/statusRepoQuery.port.js";
 
-/**
- * Use case: listar Status
- * Depende de: statusQuery.findAll(): Promise<Array<{id,name}>>
- */
-export function makeListStatuses({ statusQuery }) {
+export function makeListStatuses({ statusQueryRepo }) {
+    const repo = assertStatusRepoQuery(statusQueryRepo);
     return async function listStatuses() {
-        const rows = await statusQuery.findAll();
-        // Normalizamos la salida
-        return rows.map(s => ({ id: s.id, name: s.name }));
+        return repo.findAll();
     };
 }
-
-export default makeListStatuses;

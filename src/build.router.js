@@ -20,8 +20,8 @@ import { makeListCategories } from "./application/category_service/listCategorie
 import { makeGetCategoryById } from "./application/category_service/getCategoryById.query.js";
 import { makeOrderController } from "./presentation/controllers/order.controller.js";
 import categoryCommandRepository from "./infrastructure/command/category.command.js";
-import makeListDeliveryTypes from "./application/catalog_service/listDeliveryTypes.query.js";
-import makeListStatuses from "./application/catalog_service/listStatuses.query.js";
+import { makeListDeliveryTypes } from "./application/catalog_service/listDeliveryTypes.query.js";
+import { makeListStatuses } from "./application/catalog_service/listStatuses.query.js";
 import { makeCategoryController } from "./presentation/controllers/category.controller.js";
 import { makeCreateOrder } from "./application/order_service/createOrder.command.js";
 import { makeListOrders } from "./application/order_service/listOrders.query.js";
@@ -33,7 +33,6 @@ import { makeCategoryRoutes } from "./presentation/routes/category.routes.js";
 import { makeDishRoutes } from "./presentation/routes/dish.routes.js";
 
 export async function buildContainer() {
-
 
     await syncDb({ alter: true });
 

@@ -1,15 +1,8 @@
-// src/application/catalog/listDeliveryTypes.query.js
+import { assertDeliveryTypeRepoQuery } from "../../domain/ports/deliveryTypeRepoQuery.port.js";
 
-/**
- * Use case: listar DeliveryTypes
- * Depende de un query con: deliveryTypeQuery.findAll(): Promise<Array<{id,name}>>
- */
-export function makeListDeliveryTypes({ deliveryTypeQuery }) {
+export function makeListDeliveryTypes({ deliveryTypeQueryRepo }) {
+    const repo = assertDeliveryTypeRepoQuery(deliveryTypeQueryRepo);
     return async function listDeliveryTypes() {
-        const rows = await deliveryTypeQuery.findAll();
-        // Normalizamos la salida por si el repo trae extras
-        return rows.map(dt => ({ id: dt.id, name: dt.name }));
+        return repo.findAll();
     };
 }
-
-export default makeListDeliveryTypes;

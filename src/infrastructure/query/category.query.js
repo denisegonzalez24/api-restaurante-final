@@ -1,15 +1,6 @@
 // src/infrastructure/query/categoryQueryRepo.js
 import { Op } from "sequelize";
 
-/**
- * Métodos expuestos:
- *  - findAll()
- *  - findById(id)
- *  - findByName(name)
- *  - existsById(id)
- *  - existsByName(name)
- *  - existsByNameExcludingId(name, excludeId)
- */
 export function categoryQueryRepository({ models }) {
     const { Category } = models;
 

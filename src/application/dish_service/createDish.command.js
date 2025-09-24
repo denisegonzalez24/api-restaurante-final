@@ -1,5 +1,5 @@
 import { makeDish } from "../../domain/entities/dish.js";
-import { assertCategoryRepoQuery } from "../../domain/ports/categoryRepoQuery.js";
+import { assertCategoryRepoQuery } from "../../domain/ports/categoryRepoQuery.port.js";
 import { assertDishRepoCommand } from "../../domain/ports/dishRepoCommand.port.js";
 import { assertDishRepoQuery } from "../../domain/ports/dishRepoQuery.port.js";
 import { ApiError } from "../../shared/ApiError.js";
