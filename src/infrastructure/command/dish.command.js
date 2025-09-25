@@ -28,5 +28,7 @@ export function dishCommandRepository({ models }) {
             return row ? makeDish({ ...row.get() }) : null;
         },
 
+
+
     };
 }

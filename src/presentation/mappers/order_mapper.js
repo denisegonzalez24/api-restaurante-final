@@ -15,3 +15,20 @@ export function normalizeOrderBody(body = {}) {
         items,
     };
 }
+
+
+export function createOrderToCommand(dto) {
+
+    const items = Array.isArray(dto?.items) ? dto.items.map(it => ({
+        dishId: it.id,
+        quantity: Number(it.quantity || 1),
+        notes: it?.notes ?? null,
+    })) : [];
+
+    return {
+        items,
+        deliveryTypeId: dto?.delivery?.id ?? null,
+        deliveryTo: dto?.delivery?.to ?? null,
+        notes: dto?.notes ?? null,
+    };
+}

@@ -13,7 +13,8 @@ export function makeOrderController({
     return {
         create: async (req, res, next) => {
             try {
-                const order = await createOrder(req.body || {});
+                const payload = createOrderToCommand(req.body);
+                const order = await createOrder(payload);
                 res.status(Status.created).json(order);
             } catch (e) { next(e); }
         },
