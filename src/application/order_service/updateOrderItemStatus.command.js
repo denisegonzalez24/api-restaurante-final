@@ -1,7 +1,7 @@
 import { ApiError } from "../../shared/ApiError.js";
 import Status from "../../shared/status.js";
 
-export function makeUpdateOrderItemStatus({ orderCommandRepo, orderQueryRepo }) {
+export function makeUpdateOrderItemStatus({ orderCommandRepo, orderQueryRepo, statusQueryRepo }) {
     return async function updateOrderItemStatus(orderId, itemId, status) {
 
         const order = await orderQueryRepo.findById(orderId);

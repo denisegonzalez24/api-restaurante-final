@@ -1,34 +1,13 @@
-export function normalizeOrderBody(body = {}) {
-    const deliveryTypeId = body.deliveryTypeId ?? body.delivery?.id ?? null;
-    const deliveryTo = body.deliveryTo ?? body.delivery?.to ?? null;
 
-    const items = Array.isArray(body.items) ? body.items.map(it => ({
-        dishId: it.dishId ?? it.id,
-        quantity: Number(it.quantity || 1),
-        notes: it.notes ?? null,
-    })) : [];
-
+export function createOrderToCommand(dto = {}) {
     return {
-        deliveryTypeId,
-        deliveryTo,
-        notes: body.notes ?? null,
-        items,
-    };
-}
-
-
-export function createOrderToCommand(dto) {
-
-    const items = Array.isArray(dto?.items) ? dto.items.map(it => ({
-        dishId: it.id,
-        quantity: Number(it.quantity || 1),
-        notes: it?.notes ?? null,
-    })) : [];
-
-    return {
-        items,
-        deliveryTypeId: dto?.delivery?.id ?? null,
-        deliveryTo: dto?.delivery?.to ?? null,
+        deliveryTypeId: dto?.delivery?.id ?? dto?.deliveryTypeId ?? null,
+        deliveryTo: dto?.delivery?.to ?? dto?.deliveryTo ?? null,
         notes: dto?.notes ?? null,
+        items: Array.isArray(dto.items) ? dto.items.map(it => ({
+            dishId: it.dishId ?? it.id,
+            quantity: Number(it.quantity || 1),
+            notes: it?.notes ?? null,
+        })) : []
     };
 }

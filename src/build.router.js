@@ -32,6 +32,7 @@ import { makeUpdateOrderItemStatus } from "./application/order_service/updateOrd
 import { makeCategoryRoutes } from "./presentation/routes/category.routes.js";
 import { makeDishRoutes } from "./presentation/routes/dish.routes.js";
 import { makeUpdateOrderItemQuantity } from "./application/order_service/updateOrderItemQuantity.command.js";
+import { makeDeleteDish } from "./application/dish_service/deleteDish.command.js";
 
 export async function buildContainer() {
 
@@ -52,6 +53,7 @@ export async function buildContainer() {
     const createDish = makeCreateDish({ dishCommandRepo, dishQueryRepo, categoryQueryRepo });
     const updateDish = makeUpdateDish({ dishCommandRepo, dishQueryRepo, categoryQueryRepo });
     const listDishes = makeListDishes({ dishQueryRepo });
+    const deleteDish = makeDeleteDish({ dishQueryRepo, dishCommandRepo, orderQueryRepo });
 
 
     const createCategory = makeCreateCategory({ categoryQueryRepo, categoryCommandRepo });
@@ -68,13 +70,13 @@ export async function buildContainer() {
     const createOrder = makeCreateOrder({ orderCommandRepo, orderQueryRepo });
     const listOrders = makeListOrders({ orderQueryRepo });
     const getOrderById = makeGetOrderById({ orderQueryRepo });
-    const addItemToOrder = makeAddItemToOrder({ orderCommandRepo, orderQueryRepo });
+    const addItemToOrder = makeAddItemToOrder({ orderCommandRepo, orderQueryRepo, dishQueryRepo, statusQueryRepo });
     const removeItemFromOrder = makeRemoveItemFromOrder({ orderCommandRepo });
     const updateOrderItemStatus = makeUpdateOrderItemStatus({ orderCommandRepo, orderQueryRepo, statusQueryRepo });
     const updateOrderItemQuantity = makeUpdateOrderItemQuantity({ orderQueryRepo, orderCommandRepo, statusQueryRepo });
 
 
-    const dishController = makeDishController({ createDish, updateDish, listDishes });
+    const dishController = makeDishController({ createDish, updateDish, listDishes, deleteDish });
     const catalogController = makeCatalogController({ listCategories, listDeliveryTypes, listStatuses, });
     const orderController = makeOrderController({ createOrder, listOrders, getOrderById, addItemToOrder, removeItemFromOrder, updateOrderItemStatus, updateOrderItemQuantity });
     const categoryController = makeCategoryController({ listCategories, getCategoryById, createCategory, updateCategory, deleteCategory, });

@@ -35,7 +35,7 @@ export function orderQueryRepository({ models }) {
             }
 
             if (status != null) {
-                // aceptamos id o nombre
+
                 if (Number.isFinite(+status)) {
                     where.overallStatusId = +status;
                 } else {
@@ -48,7 +48,7 @@ export function orderQueryRepository({ models }) {
             const rows = await Order.findAll({
                 where,
                 include: [
-                    { model: Status, as: "status", attributes: ["id", "name"] },
+                    { model: Status, as: "overallStatus", attributes: ["id", "name"] },
                     { model: DeliveryType, as: "deliveryType", attributes: ["id", "name"] },
                 ],
                 order: [["id", "DESC"]],
@@ -56,5 +56,11 @@ export function orderQueryRepository({ models }) {
 
             return rows.map((r) => r.get());
         },
+
+        async hasOrderItemsForDish(dishId) {
+            const count = await OrderItem.count({ where: { dishId } });
+            return count > 0;
+        },
     };
+
 }

@@ -5,6 +5,7 @@ export function makeDishRoutes(controller) {
     r.post("/", controller.create);
     r.get("/", controller.list);
     r.put("/:id", controller.update);
+    r.delete("/:id", controller.delete);
     return r;
 }
 

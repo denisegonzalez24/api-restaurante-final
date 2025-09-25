@@ -27,8 +27,13 @@ export function dishCommandRepository({ models }) {
             const row = await Dish.findByPk(id);
             return row ? makeDish({ ...row.get() }) : null;
         },
-
-
-
+        async deleteById(id, options = {}) {
+            const count = await Dish.destroy({
+                where: { id },
+                transaction: options.transaction,
+            });
+            return count;
+        },
     };
-}
+};
+
