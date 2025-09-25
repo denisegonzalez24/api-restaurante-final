@@ -70,7 +70,7 @@ export async function buildContainer() {
     const getOrderById = makeGetOrderById({ orderQueryRepo });
     const addItemToOrder = makeAddItemToOrder({ orderCommandRepo, orderQueryRepo });
     const removeItemFromOrder = makeRemoveItemFromOrder({ orderCommandRepo });
-    const updateOrderItemStatus = makeUpdateOrderItemStatus({ orderCommandRepo, orderQueryRepo });
+    const updateOrderItemStatus = makeUpdateOrderItemStatus({ orderCommandRepo, orderQueryRepo, statusQueryRepo });
     const updateOrderItemQuantity = makeUpdateOrderItemQuantity({ orderQueryRepo, orderCommandRepo, statusQueryRepo });
 
 

@@ -12,13 +12,10 @@ export function makeUpdateOrderItemStatus({ orderCommandRepo, orderQueryRepo }) 
 
         const closed = await statusQueryRepo.getClosedStatusIds();
         if (closed.has(Number(order.overallStatusId))) {
-            throw new ApiError({
-                message: "La orden está cerrada; no se pueden agregar ni editar ítems",
-                status: Status.badRequest
-            });
+            throw new ApiError({ message: "La orden está cerrada; no se pueden agregar ni editar ítems", status: Status.badRequest });
         }
 
-        const result = await orderCommandRepo.updateOrderItemStatus(itemId, status);
+        const result = await orderCommandRepo.updateItemStatus(itemId, status);
         const updated = await orderQueryRepo.findById(result.orderId ?? orderId);
         return updated;
     };
