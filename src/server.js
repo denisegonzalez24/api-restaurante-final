@@ -15,4 +15,3 @@ createApp()
         console.error("Error al iniciar:", err);
         process.exit(1);
     });
-
