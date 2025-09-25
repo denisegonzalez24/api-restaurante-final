@@ -71,7 +71,7 @@ export async function buildContainer() {
     const addItemToOrder = makeAddItemToOrder({ orderCommandRepo, orderQueryRepo });
     const removeItemFromOrder = makeRemoveItemFromOrder({ orderCommandRepo });
     const updateOrderItemStatus = makeUpdateOrderItemStatus({ orderCommandRepo, orderQueryRepo });
-    const updateOrderItemQuantity = makeUpdateOrderItemQuantity({ orderQueryRepo, orderCommandRepo });
+    const updateOrderItemQuantity = makeUpdateOrderItemQuantity({ orderQueryRepo, orderCommandRepo, statusQueryRepo });
 
 
     const dishController = makeDishController({ createDish, updateDish, listDishes });
