@@ -2,7 +2,6 @@ import { Op } from "sequelize";
 
 export function orderQueryRepository({ models }) {
     const { Order, OrderItem, Dish, Status, DeliveryType, Category } = models;
-
     return {
         models,
 
@@ -10,12 +9,13 @@ export function orderQueryRepository({ models }) {
             const row = await Order.findByPk(id, {
                 include: [
                     { model: Status, as: "overallStatus", attributes: ["id", "name"] },
+                    { model: DeliveryType, as: "deliveryType", attributes: ["id", "name"] },
                     {
                         model: OrderItem, as: "items",
                         include: [
                             { model: Status, as: "status", attributes: ["id", "name"] },
                             {
-                                model: Dish, as: "dish", attributes: ["id", "name", "price"],
+                                model: Dish, as: "dish", attributes: ["id", "name", "price", "imageUrl"],
                                 include: [{ model: Category, as: "category", attributes: ["id", "name"] }]
                             },
                         ],

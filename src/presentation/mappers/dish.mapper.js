@@ -49,3 +49,13 @@ export function toDishResponse({ dish, category }) {
     };
 }
 export function toDishesResponse(list) { return list.map(item => toDishResponse({ dish: item, category: item.category })); }
+
+
+export function mapDishShort(dish) {
+    if (!dish) return null;
+    return {
+        id: dish.id,
+        name: dish.name ?? null,
+        image: dish.imageUrl ?? null,
+    };
+}

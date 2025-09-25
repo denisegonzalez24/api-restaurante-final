@@ -3,13 +3,19 @@ import Status from "../../shared/status.js";
 import { toCreateDishDto, toUpdateDishDto, toListParams, toDishesResponse, toDishResponse } from "../mappers/dish.mapper.js";
 
 
-export function makeDishController({ createDish, updateDish, listDishes, deleteDish }) {
+export function makeDishController({ createDish, getDishById, updateDish, listDishes, deleteDish }) {
     return {
         create: async (req, res, next) => {
             try {
                 const dto = toCreateDishDto(req.body);
                 const result = await createDish(dto);
                 res.status(Status.created).json(toDishResponse({ dish: result.dish, category: result.category }));
+            } catch (e) { next(e); }
+        },
+        getById: async (req, res, next) => {
+            try {
+                const dish = await getDishById(req.params.id);
+                res.status(Status.ok).json(toDishResponse({ dish, category: dish.category }));
             } catch (e) { next(e); }
         },
         list: async (req, res, next) => {
@@ -29,7 +35,7 @@ export function makeDishController({ createDish, updateDish, listDishes, deleteD
         },
         delete: async (req, res, next) => {
             try {
-                const idDelete = toListParams(req.params.id);
+                const idDelete = req.params.id;
                 const result = await deleteDish(idDelete);
                 res.status(Status.ok).json(toDishesResponse(result));
             } catch (e) { next(e); }
