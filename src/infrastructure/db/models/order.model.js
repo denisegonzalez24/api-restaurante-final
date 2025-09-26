@@ -10,4 +10,6 @@ export default (sequelize) =>
         updateDate: { type: DataTypes.DATE, allowNull: true, field: "UpdateDate" },
         deliveryTypeId: { type: DataTypes.INTEGER, allowNull: true, field: "DeliveryType" },
         overallStatusId: { type: DataTypes.INTEGER, allowNull: true, field: "OverallStatus" },
-    }, { tableName: "Order", timestamps: false, freezeTableName: true });
+    }, {
+        tableName: "Order", timestamps: false, freezeTableName: true, createdAt: "CreateDate", updatedAt: "UpdateDate",
+    });

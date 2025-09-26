@@ -306,13 +306,14 @@ paths:
     delete:
       tags:
         - Dish
-      summary: Eliminar plato (borrado real)
+      summary: Eliminar plato
       description: |
-        Elimina definitivamente un plato del menú del restaurante.
+        Elimina un plato del menú del restaurante.
         
-        **Reglas:**
-        - No se permite eliminar platos que estén referenciados por **cualquier** orden
-          (incluye órdenes cerradas o históricas).
+        **Importante:** 
+        - Elimina definitivamente un plato del menú del restaurante.
+        - No se permite eliminar platos que estén referenciados
+        
       parameters:
         - name: id
           in: path
@@ -323,8 +324,24 @@ paths:
             format: uuid
           example: "123e4567-e89b-12d3-a456-426614174000"
       responses:
-        '204':
-          description: Plato eliminado definitivamente (sin contenido)
+        '200':
+          description: Plato eliminado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DishResponse'
+              example:
+                id: "123e4567-e89b-12d3-a456-426614174000"
+                name: "Pizza Margherita"
+                description: "Pizza clásica con salsa de tomate, mozzarella fresca, albahaca y aceite de oliva extra virgen"
+                price: 850.50
+                category:
+                  id: 1
+                  name: "Pizzas"
+                image: "https://restaurant.com/images/pizza-margherita.jpg"
+                isActive: false
+                createdAt: "2024-03-15T10:30:00Z"
+                updatedAt: "2024-03-15T16:20:00Z"
         '404':
           description: Plato no encontrado
           content:
@@ -340,7 +357,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiError'
               example:
-                message: "No se puede eliminar el plato porque está referenciado por órdenes (incluidas cerradas)" # mensaje ajustado
+                message: "No se puede eliminar el plato porque está incluido en órdenes"
 
   # ========== CATEGORY ENDPOINTS ==========
   /api/v1/Category:
@@ -607,7 +624,6 @@ paths:
               example:
                 message: "Rango de fechas inválido"
 
-  /api/v1/Order:
     put:
       tags:
         - Order
@@ -1223,7 +1239,7 @@ components:
         - quantity
       properties:
         id:
-          type: string.
+          type: string
           format: uuid
           description: ID del plato solicitado
           example: "123e4567-e89b-12d3-a456-426614174000"

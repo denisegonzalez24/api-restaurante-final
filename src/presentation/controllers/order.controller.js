@@ -1,5 +1,5 @@
 import Status from "../../shared/status.js";
-import { createOrderToCommand, toOrderCreateResponse, toOrderDetailsResponse, toOrderDetailsResponseList } from "../mappers/order_mapper.js";
+import { createOrderToCommand, toOrderCreateResponse, toOrderDetailsResponse, toOrderDetailsResponseList, toOrderUpdateResponse } from "../mappers/order_mapper.js";
 
 
 export function makeOrderController({
@@ -7,8 +7,8 @@ export function makeOrderController({
     listOrders,
     getOrderById,
     addItemToOrder,
-    updateOrderItemStatus,
-    updateOrderItemQuantity
+    updateOrderItems,
+    updateOrderItemStatus
 }) {
     return {
         create: async (req, res, next) => {
@@ -21,8 +21,8 @@ export function makeOrderController({
 
         list: async (req, res, next) => {
             try {
-                const { date, status } = req.query || {};
-                const result = await listOrders({ date, status });
+                const { from, to, status } = req.query || {};
+                const result = await listOrders({ from, to, status });
                 res.status(Status.ok).json(toOrderDetailsResponseList(result));
             } catch (e) { next(e); }
         },
@@ -44,20 +44,24 @@ export function makeOrderController({
         updateItemStatus: async (req, res, next) => {
             try {
                 const { status } = req.body || {};
-                const { orderId, itemId } = req.params;
+                const orderId = req.params.orderId ?? req.params.id;
+                const itemId = req.params.itemId;
                 const result = await updateOrderItemStatus(orderId, itemId, status);
-                res.status(Status.ok).json(toOrderDetailsResponse(result));
+                return res.status(Status.ok).json(toOrderUpdateResponse(result));
             } catch (e) { next(e); }
         },
-        updateItemQuantity: async (req, res, next) => {
+        update: async (req, res, next) => {
             try {
-                const { quantity } = req.body || {};
-                const { orderId, itemId } = req.params;
-                const result = await updateOrderItemQuantity(orderId, itemId, quantity);
-                res.status(Status.ok).json(toOrderDetailsResponse(result));
+                const { items = [], orderId } = req.body ?? {};
+                if (!Array.isArray(items)) {
+                    return res.status(Status.badRequest).json({ message: "Formato inválido: 'items' debe ser un array" });
+                }
+                const updated = await updateOrderItems({ items, orderId });
+
+                return res.status(Status.ok).json(toOrderUpdateResponse(updated));
+
             } catch (e) { next(e); }
         }
     };
 }
-
 export default makeOrderController;

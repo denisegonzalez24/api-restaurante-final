@@ -78,3 +78,12 @@ export function createOrderToCommand(dto = {}) {
         })) : []
     };
 }
+
+export function toOrderUpdateResponse(order) {
+    if (!order) return null;
+    return {
+        orderNumber: Number(order.id),
+        totalAmount: Number(order.price),
+        updateAt: order.updateDate ?? order.updatedAt ?? null,
+    };
+}
