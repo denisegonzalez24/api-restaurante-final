@@ -1,14 +1,14 @@
 import { makeGetCategoryById } from './getCategoryById.query.js';
 
 export const makeUpdateCategory = ({ categoryRepoQuery, categoryRepoCommand }) => async (id, dto) => {
-    // reusar validaciones del create
+
     if (!dto || typeof dto !== 'object') { const e = new Error('Body inválido'); e.status = 400; throw e; }
     const payload = {
         name: dto.name,
         description: dto.description ?? null,
         order: dto.order ?? null,
     };
-    // Validaciones
+
     if (!payload.name || !payload.name.trim()) { const e = new Error('El nombre de la categoría es obligatorio'); e.status = 400; throw e; }
     if (payload.name.length > 100) { const e = new Error('El nombre no puede superar 100 caracteres'); e.status = 400; throw e; }
     if (payload.description && payload.description.length > 500) { const e = new Error('La descripción no puede superar 500 caracteres'); e.status = 400; throw e; }

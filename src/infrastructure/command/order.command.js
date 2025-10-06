@@ -1,4 +1,4 @@
-// src/infrastructure/command/order.command.js
+
 import { Sequelize } from "sequelize";
 
 export function orderCommandRepository({ models }) {

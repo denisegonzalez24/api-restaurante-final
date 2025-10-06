@@ -27,20 +27,16 @@ export function makeDishController({ createDish, getDishById, updateDish, listDi
         },
         update: async (req, res, next) => {
             try {
-                const { items = [], orderId } = req.body ?? {};
-                if (!Array.isArray(items)) {
-                    return res.status(Status.badRequest).json({ message: "Formato inválido: 'items' debe ser un array" });
-                }
-                // 👇  OJO: ahora inyectamos updateOrderItems (no usamos application.* aquí)
-                const updated = await updateOrderItems({ items, orderId, ctx: req });
+                const dto = toUpdateDishDto(req.body);
+                const result = await updateDish(req.params.id, dto);
 
-                return res.status(Status.ok).json(toOrderUpdateResponse(updated));
+                return res.status(Status.ok).json(toDishResponse(result));
             } catch (e) { next(e); }
         },
         delete: async (req, res, next) => {
             try {
                 const idDelete = req.params.id;
-                const before = await application.dish.getById({ id: idDelete });
+                const before = await getDishById({ id: idDelete });
                 const one = before ?? (Array.isArray(result) ? result[0] : result);
                 const result = await deleteDish(idDelete);
                 return res.status(Status.ok).json(toDishResponse(one));
@@ -49,3 +45,15 @@ export function makeDishController({ createDish, getDishById, updateDish, listDi
     };
 }
 
+/** pasar a orders
+const { items = [], orderId } = req.body ?? {};
+                if (!Array.isArray(items)) {
+                    return res.status(Status.badRequest).json({ message: "Formato inválido: 'items' debe ser un array" });
+                }
+
+                const updated = await updateOrderItems({ items, orderId, ctx: req });
+
+                return res.status(Status.ok).json(toOrderUpdateResponse(updated));
+            } catch (e) { next(e); } 
+ * 
+ */

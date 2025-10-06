@@ -1,15 +1,6 @@
 import Status from "../../shared/status.js";
 
-/**
- * Espera funciones (use cases):
- * {
- *   listCategories,       // () => Promise<Category[]>
- *   getCategoryById,      // (id) => Promise<Category|null>
- *   createCategory,       // (dto) => Promise<Category>
- *   updateCategory,       // (id, dto) => Promise<Category>
- *   deleteCategory,       // (id) => Promise<void>
- * }
- */
+
 export function makeCategoryController({
     listCategories,
     getCategoryById,
