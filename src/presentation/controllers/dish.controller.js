@@ -46,16 +46,3 @@ export function makeDishController({ createDish, getDishById, updateDish, listDi
         }
     };
 }
-
-/** pasar a orders
-const { items = [], orderId } = req.body ?? {};
-                if (!Array.isArray(items)) {
-                    return res.status(Status.badRequest).json({ message: "Formato inválido: 'items' debe ser un array" });
-                }
-
-                const updated = await updateOrderItems({ items, orderId, ctx: req });
-
-                return res.status(Status.ok).json(toOrderUpdateResponse(updated));
-            } catch (e) { next(e); } 
- * 
- */
