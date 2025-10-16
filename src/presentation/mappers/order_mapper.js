@@ -42,12 +42,11 @@ export function toOrderCreateResponse(order) {
 }
 
 export function toOrderDetailsResponseList(rows = []) {
+    if (!rows) return [];
     const arr =
         Array.isArray(rows) ? rows
             : (rows && Array.isArray(rows.rows)) ? rows.rows
                 : rows ? [rows] : [];
-
-    console.log(arr);
 
     return arr.map(r => ({
         orderNumber: Number(r.id),
@@ -60,7 +59,7 @@ export function toOrderDetailsResponseList(rows = []) {
         deliveryType: r.deliveryType
             ? { id: Number(r.deliveryType.id), name: r.deliveryType.name }
             : null,
-        items: undefined,
+        items: Array.isArray(r.items) ? r.items.map(mapItemResponse) : [],
         createdAt: r.createDate ?? null,
         updatedAt: r.updateDate ?? null,
     }));
