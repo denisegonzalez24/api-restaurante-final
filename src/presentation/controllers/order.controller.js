@@ -38,7 +38,7 @@ export function makeOrderController({
             try {
                 const { dishId, quantity, notes } = req.body || {};
                 const result = await addItemToOrder(req.params.id, { dishId, quantity, notes });
-                res.status(Status.created).json(toOrderDetailsResponse(result));
+                res.status(Status.created).json({ message: "Item added successfully", data: toOrderDetailsResponse(result) });
             } catch (e) { next(e); }
         },
         updateItemStatus: async (req, res, next) => {

@@ -29,6 +29,7 @@ export function makeDishController({ createDish, getDishById, updateDish, listDi
             try {
                 const dto = toUpdateDishDto(req.body);
                 const result = await updateDish(req.params.id, dto);
+                console.log(result);
 
                 return res.status(Status.ok).json(toDishResponse(result));
             } catch (e) { next(e); }
@@ -36,9 +37,10 @@ export function makeDishController({ createDish, getDishById, updateDish, listDi
         delete: async (req, res, next) => {
             try {
                 const idDelete = req.params.id;
-                const before = await getDishById({ id: idDelete });
-                const one = before ?? (Array.isArray(result) ? result[0] : result);
+                const before = await getDishById(idDelete);
+
                 const result = await deleteDish(idDelete);
+                const one = before ?? (Array.isArray(result) ? result[0] : result);
                 return res.status(Status.ok).json(toDishResponse(one));
             } catch (e) { next(e); }
         }

@@ -3,7 +3,7 @@ import { DataTypes } from "sequelize";
 export default (sequelize) =>
     sequelize.define("Order", {
         id: { type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true, field: "OrderId" },
-        deliveryTo: { type: DataTypes.STRING(25), allowNull: true, field: "DeliveryTo" },
+        deliveryTo: { type: DataTypes.STRING(255), allowNull: true, field: "DeliveryTo" },
         notes: { type: DataTypes.TEXT, allowNull: true, field: "Notes" },
         price: { type: DataTypes.DECIMAL(10, 2), allowNull: true, field: "Price" },
         createDate: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW, field: "CreateDate" },

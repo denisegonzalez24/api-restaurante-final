@@ -6,11 +6,13 @@ import swaggerUi from 'swagger-ui-express';
 import { fileURLToPath } from "url";
 import fs from "fs";
 import yaml from "js-yaml";
+import cors from "cors";
 
 
 export async function createApp() {
     const app = express();
     app.use(express.json());
+    app.use(cors());
 
     const { routers } = await buildContainer();
 

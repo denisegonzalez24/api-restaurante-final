@@ -42,6 +42,8 @@ export function orderCommandRepository({ models }) {
                         deliveryTypeId: body?.deliveryTypeId ?? null,
                         overallStatusId: stPending?.id ?? null,
                         createDate: Sequelize.fn("NOW"),
+                        updateDate: Sequelize.fn("NOW"),
+
                     },
                     { transaction: t }
                 );

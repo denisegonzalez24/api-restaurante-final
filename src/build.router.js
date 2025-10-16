@@ -54,7 +54,7 @@ export async function buildContainer() {
     const updateDish = makeUpdateDish({ dishCommandRepo, dishQueryRepo, categoryQueryRepo });
     const listDishes = makeListDishes({ dishQueryRepo });
     const deleteDish = makeDeleteDish({ dishQueryRepo, dishCommandRepo, orderQueryRepo });
-    const getDishById = makeGetDishById({ dishQueryRepo });
+    const getDishById = makeGetDishById({ dishQueryRepo, categoryQueryRepo });
 
 
     const createCategory = makeCreateCategory({ categoryQueryRepo, categoryCommandRepo });
