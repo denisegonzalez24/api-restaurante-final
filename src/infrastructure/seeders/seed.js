@@ -63,29 +63,12 @@ async function seedAll({ reset = false } = {}) {
                 categoryId: 1,
             },
             {
-                name: "Provoleta clásica",
-                description: "Queso provolone a la parrilla con orégano.",
-                price: 3800.00,
-                available: true,
-                imageUrl: "hhttps://holavegan.com/wp-content/uploads/2021/03/provoleta01.jpg",
-                categoryId: 1,
-            },
-            {
                 name: "Bruschetta caprese",
                 description: "Tomate, albahaca y mozzarella sobre pan tostado.",
                 price: 2600.00,
                 available: true,
                 imageUrl: "https://www.oleariaclemente.it/wp-content/uploads/2015/06/bruschetta-caprese.jpg",
                 categoryId: 1,
-            },
-
-            {
-                name: "Ensalada César",
-                description: "Lechuga romana, croutons, parmesano y aderezo césar.",
-                price: 4200.00,
-                available: true,
-                imageUrl: "https://upload.wikimedia.org/wikipedia/commons/7/7b/Caesar_salad_%281%29.jpghttps://ariztia.com/wp-content/uploads/2023/11/ensalada-cesar-de-pollo.jpg",
-                categoryId: 2,
             },
             {
                 name: "Ensalada mixta",
