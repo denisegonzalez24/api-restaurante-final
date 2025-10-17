@@ -12,7 +12,7 @@ async function seedAll({ reset = false } = {}) {
         await syncDb({ alter: true });
     }
 
-    const { DeliveryType, Status, Category } = models;
+    const { DeliveryType, Status, Category, Dish } = models;
 
 
     await DeliveryType.bulkCreate(
@@ -227,8 +227,6 @@ async function seedAll({ reset = false } = {}) {
                 imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRraFJMBewfPeaCIDHa1O9ga0C149cCtbIjEQ&s",
                 categoryId: 9,
             },
-
-            // 10) POSTRES (10)
             {
                 name: "Flan casero",
                 description: "Con dulce de leche y crema.",
@@ -254,15 +252,8 @@ async function seedAll({ reset = false } = {}) {
 }
 
 
-
-
-
-
-logCyan("Precarga completa (DeliveryType, Status, Category).");
-await sequelize.close();
-
 const reset = String(process.env.RESET || "false").toLowerCase() === "true";
 seedAll({ reset }).catch((e) => {
-    logCyan("Error en seed:", e);
+    console.log("Error en seed:", e);
     process.exit(1);
 });
