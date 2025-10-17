@@ -29,7 +29,6 @@ export function makeDishController({ createDish, getDishById, updateDish, listDi
             try {
                 const dto = toUpdateDishDto(req.body);
                 const result = await updateDish(req.params.id, dto);
-                console.log(result);
 
                 return res.status(Status.ok).json(toDishResponse(result));
             } catch (e) { next(e); }

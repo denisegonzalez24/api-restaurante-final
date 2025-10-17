@@ -77,11 +77,10 @@ export function makeUpdateOrderItems({
             );
 
             if (existing) {
-
                 await orderCommandRepo.updateItemQuantity(existing.id, quantity, notes);
             } else {
 
-                await orderCommandRepo.addItem(order.id, dishId, quantity, notes);
+                await orderCommandRepo.addItem(order.id, { dishId, quantity, notes });
             }
         }
 
@@ -101,8 +100,8 @@ export function makeUpdateOrderItems({
             totalAmount += unit * qty;
         }
 
-        await orderCommandRepo.updateTotal(reloaded.id, totalAmount);
-        await orderCommandRepo.touchUpdateDate(reloaded.id);
+        // await orderCommandRepo.updateTotal(reloaded.id, totalAmount);
+        // await orderCommandRepo.touchUpdateDate(reloaded.id);
 
 
         const updated = await orderQueryRepo.findById(reloaded.id);

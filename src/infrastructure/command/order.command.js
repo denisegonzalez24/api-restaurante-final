@@ -76,7 +76,6 @@ export function orderCommandRepository({ models }) {
             return sequelize.transaction(async (t) => {
                 const order = await Order.findByPk(orderId, { transaction: t });
                 if (!order) throw new Error("OrderNotFound");
-
                 const dish = await Dish.findByPk(dishId, { transaction: t });
                 if (!dish) throw new Error("DishNotFound");
 
@@ -93,7 +92,7 @@ export function orderCommandRepository({ models }) {
                     },
                     { transaction: t }
                 );
-
+                console.log('despues de create');
                 await recalcTotal(order.id, t);
                 await computeOrderStatus(order.id, t);
                 return { orderId: order.id };

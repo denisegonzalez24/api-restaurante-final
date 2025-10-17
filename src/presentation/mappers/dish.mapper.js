@@ -34,7 +34,6 @@ export function toListParams(query) {
 }
 
 export function toDishResponse({ dish, category }) {
-    console.log(dish);
 
     return {
         id: dish.id,
