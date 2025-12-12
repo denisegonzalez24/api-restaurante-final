@@ -39,7 +39,7 @@
 ### /api/v1/Order
 - POST → Crear orden 🟩
 - GET → Buscar órdenes 🟩
-- PATCH → Actualizar orden 🟥 falta validacion de no dejar agregar si la oprden esta cerrada
+- PATCH → Actualizar orden 🟩
 
 ### /api/v1/Order/{id}
 - GET → Obtener orden por número 

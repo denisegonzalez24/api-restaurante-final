@@ -14,6 +14,9 @@ export function makeUpdateOrderItemStatus({ orderCommandRepo, orderQueryRepo, st
         if (closed.has(Number(order.overallStatusId))) {
             throw new ApiError({ message: "La orden está cerrada; no se pueden agregar ni editar ítems", status: Status.badRequest });
         }
+        const currentStatusId = Number(item.status?.id);
+
+        if (status < currentStatusId) throw new ApiError({ message: "El nuevo estado no puede ser anterior al estado actual", status: Status.badRequest });
 
         const result = await orderCommandRepo.updateItemStatus(itemId, status);
         const updated = await orderQueryRepo.findById(result.orderId ?? orderId);
