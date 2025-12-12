@@ -122,8 +122,7 @@ export function orderCommandRepository({ models }) {
 
         async updateItemQuantity(orderItemId, quantity) {
             return sequelize.transaction(async (t) => {
-                // Validación fina (>=1 entero) debería estar en el use-case;
-                // aquí solo evitamos números imposibles por seguridad:
+
                 const q = Number(quantity);
                 if (!Number.isFinite(q) || q <= 0) throw new Error("InvalidQuantity");
 

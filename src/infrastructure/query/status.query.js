@@ -14,7 +14,7 @@ export function statusQueryRepository({ models }) {
             return rows.map(r => r.get());
         },
         async getClosedStatusIds() {
-            const rows = await Status.findAll({ where: { name: ["Delivered", "Cancelled"] } });
+            const rows = await Status.findAll({ where: { name: ["Delivered", "Closed"] } });
             return new Set(rows.map(r => Number(r.id)));
         }
     };
