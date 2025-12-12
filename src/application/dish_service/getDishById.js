@@ -4,10 +4,18 @@ export function makeGetDishById({ dishQueryRepo, categoryQueryRepo }) {
     const repo = assertDishRepoQuery(dishQueryRepo);
     const categoryRepo = assertDishRepoQuery(categoryQueryRepo);
     return async function getDishById(id) {
-        if (!id) return null;
+        if (!id) {
+            const err = new Error('Dish no encontrado');
+            err.status = 404;
+            throw err;
+        };
 
         const dish = await repo.findById(id);
-        if (!dish) return null;
+        if (!dish) {
+            const err = new Error('Dish no encontrado');
+            err.status = 404;
+            throw err;
+        };
 
         const category = await categoryRepo.findById(dish.categoryId);
         return { ...dish, category };

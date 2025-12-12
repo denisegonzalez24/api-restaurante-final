@@ -33,14 +33,15 @@ export function makeOrderController({
                 res.status(Status.ok).json(toOrderDetailsResponse(full));
             } catch (e) { next(e); }
         },
-
-        addItem: async (req, res, next) => {
-            try {
-                const { dishId, quantity, notes } = req.body || {};
-                const result = await addItemToOrder(req.params.id, { dishId, quantity, notes });
-                res.status(Status.created).json({ message: "Item added successfully", data: toOrderDetailsResponse(result) });
-            } catch (e) { next(e); }
-        },
+        /*
+                addItem: async (req, res, next) => {
+                    try {
+                        const { dishId, quantity, notes } = req.body || {};
+                        const result = await addItemToOrder(req.params.id, { dishId, quantity, notes });
+                        res.status(Status.created).json({ message: "Item added successfully", data: toOrderDetailsResponse(result) });
+                    } catch (e) { next(e); }
+                },
+                */
         updateItemStatus: async (req, res, next) => {
             try {
                 const { status } = req.body || {};

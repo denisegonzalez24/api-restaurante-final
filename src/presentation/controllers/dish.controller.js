@@ -15,8 +15,10 @@ export function makeDishController({ createDish, getDishById, updateDish, listDi
         getById: async (req, res, next) => {
             try {
                 const dish = await getDishById(req.params.id);
-                res.status(Status.ok).json(toDishResponse({ dish, category: dish.category }));
-            } catch (e) { next(e); }
+                console.log(dish);
+                return res.status(Status.ok).json(toDishResponse({ dish, category: dish.category }));
+
+            } catch (e) { console.log(e); next(e); }
         },
         list: async (req, res, next) => {
             try {
@@ -40,7 +42,7 @@ export function makeDishController({ createDish, getDishById, updateDish, listDi
 
                 const result = await deleteDish(idDelete);
                 const one = before ?? (Array.isArray(result) ? result[0] : result);
-                return res.status(Status.ok).json(toDishResponse(one));
+                return res.status(Status.ok).json(toDishResponse({ dish: one }));
             } catch (e) { next(e); }
         }
     };
