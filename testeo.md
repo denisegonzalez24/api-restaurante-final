@@ -34,7 +34,7 @@
 
 ---
 
-## 🟥 ORDER
+## 🟩 ORDER
 
 ### /api/v1/Order
 - POST → Crear orden 🟩
@@ -44,5 +44,5 @@
 ### /api/v1/Order/{id}
 - GET → Obtener orden por número 
 ### /api/v1/Order/{id}/item/{itemId}
-- PATCH → Actualizar estado de un ítem de orden 🟥  falta validacion de no volver a un estado menor
+- PATCH → Actualizar estado de un ítem de orden 🟩
 
