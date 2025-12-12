@@ -39,12 +39,10 @@
 ### /api/v1/Order
 - POST → Crear orden 🟩
 - GET → Buscar órdenes 🟩
-- PATCH → Actualizar orden 🟥 (el updateAt no se actualiza si updateo) no es PATCH
-falta validacion de no dejar agregar si la oprden esta cerrada
+- PATCH → Actualizar orden 🟥 falta validacion de no dejar agregar si la oprden esta cerrada
 
 ### /api/v1/Order/{id}
 - GET → Obtener orden por número 
 ### /api/v1/Order/{id}/item/{itemId}
-- PATCH → Actualizar estado de un ítem de orden 🟥 (el updateAt no se actualiza si updateo)
-falta validacion de no volver a un estado menor
+- PATCH → Actualizar estado de un ítem de orden 🟥  falta validacion de no volver a un estado menor
 
